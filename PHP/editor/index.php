@@ -116,7 +116,8 @@ echo htmlspecialchars($demo_source[$type]);
 
 <script>
 function goLaunching()
-{
+{  
+   //指向WSGI服务器
    $.post("http://192.168.1.103:81/run<?php echo $type;?>", { "code": editor.getValue(),"data":$("#inputdata")[0].value}, function (data) {
       data=data.replaceAll("\r","\\r");
       data=data.replaceAll("\n","\\n");
