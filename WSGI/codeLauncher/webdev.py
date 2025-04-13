@@ -1,4 +1,4 @@
- from flask import Flask, render_template, request
+from flask import Flask, request
 from runcode import runcode
 from flask_cors import CORS
 
@@ -6,136 +6,72 @@ app = Flask(__name__)
 
 CORS(app)                                               #ajax跨域支持
 
-default_c_code = """#include <stdio.h>
-
-int main(int argc, char **argv)
-{
-    printf("Hello C World!!\\n");
-    return 0;
-}    
-"""
-
-default_cpp_code = """#include <iostream>
-
-using namespace std;
-
-int main(int argc, char **argv)
-{
-    cout << "Hello C++ World" << endl;
-    return 0;
-}
-"""
-
-default_py_code = """import sys
-import os
-
-if __name__ == "__main__":
-    print ("Hello Python World!!")
-"""
-
-#default_rows = "15"
-#default_cols = "60"
-
-#@app.route("/")
-@app.route("/runc", methods=['POST'])                   #只接受POST请求 #methods=['POST', 'GET'])
+@app.route("/runc", methods=['POST'])                   #处理C语言代码，只接受POST请求
 def runc():
     #if request.method == 'POST':
-        code = request.form['code']
-        stdinData = request.form['data']
-        run = runcode.RunCCode(code,stdinData)
-        rescompil, resrun = run.run_c_code()
-        resrun =resrun.replace("\\","\\\\")
-        resrun =resrun.replace("\"",'\\\"')
-        
+        code = request.form['code']                     #code：表单中提交的C语言源代码
+        stdinData = request.form['data']                #data：表单中提交的程序运行后需要输入的数据
+        run = runcode.RunCCode(code, stdinData)          #创建处理C语言的对象
+        resReturnCode,rescompil, resrun = run.run_c_code()            #运行C语言源代码
+                                                        #后期考虑是否要添加运行时的命令行参数        
+        resrun =resrun.replace("\\","\\\\")             #由于数据要以JSON的形式返回给JS，所以要对斜杠和双引号进行转义
+        resrun =resrun.replace("\"",'\\\"')        
         rescompil =rescompil.replace("\\","\\\\")                        
         rescompil =rescompil.replace("\"",'\\\"')
 
-        if not resrun:
-            resrun = 'No result!'
+        #if resrun=="":
+        #    resrun = '此程序已运行完毕，无输出数据。'
+
+        if resReturnCode == -99:
+            rescompil="运行超时"
             
-        #构建结果输出
+        #返回数据为JSON数据格式
         result="{ \"target\" : \"runc\", \"resrun\" : \""+resrun+"\", \"rescomp\" : \""+rescompil+"\" }"
         return result
 
-        
-    #else:
-    #    code = default_c_code
-    #    resrun = 'No result!'
-    #    rescompil = ''
-
-
-    #    return render_template("main.html",
-    #                       code=code,
-    #                       target="runc",
-    #                       resrun=resrun,
-    #                       rescomp=rescompil,
-    #                       rows=default_rows, cols=default_cols)
-
-#@app.route("/cpp")
-@app.route("/runcpp", methods=['POST'])#methods=['POST', 'GET'])
+@app.route("/runcpp", methods=['POST'])                #处理C++语言代码
 def runcpp():
     #if request.method == 'POST':
         code = request.form['code']
         stdinData = request.form['data']
-        run = runcode.RunCppCode(code,stdinData)
-        rescompil, resrun = run.run_cpp_code()
-        resrun =resrun.replace("\\","\\\\")
-        resrun =resrun.replace("\"",'\\\"')
+        run = runcode.RunCppCode(code, stdinData)
+        resReturnCode,rescompil, resrun = run.run_cpp_code()
         
+        resrun =resrun.replace("\\","\\\\")
+        resrun =resrun.replace("\"",'\\\"')        
         rescompil =rescompil.replace("\\","\\\\")                        
         rescompil =rescompil.replace("\"",'\\\"')
 
-
-        if not resrun:
-            resrun = 'No result!'
+        #if not resrun:
+        #    resrun = '此程序已运行完毕，无输出数据。'
+        if resReturnCode == -99:
+            rescompil="运行超时"
             
         #构建结果输出
         result="{\"target\":\"runcpp\",\"resrun\":\""+resrun+"\",\"rescomp\":\""+rescompil+"\"}"
         return result
-    #else:
-    #    code = default_cpp_code
-    #    resrun = 'No result!'
-    #    rescompil = ''
 
-    #    return render_template("main.html",
-    #                       code=code,
-    #                       target="runcpp",
-    #                       resrun=resrun,
-    #                       rescomp=rescompil,
-    #                       rows=default_rows, cols=default_cols)
-
-
-#@app.route("/py")
-@app.route("/runpy", methods=['POST'])#methods=['POST', 'GET'])
+@app.route("/runpy", methods=['POST'])                   #处理Python语言代码
 def runpy():
     #if request.method == 'POST':
         code = request.form['code']
-        #stdinData = request.form['data']
-        run = runcode.RunPyCode(code)
+        stdinData = request.form['data']
+        run = runcode.RunPyCode(code, stdinData)
         rescompil, resrun = run.run_py_code()
-        if not resrun:
-            resrun = 'No result!'
-        #构建结果输出
-        resrun =resrun.replace("\\","\\\\")
-        resrun =resrun.replace("\"",'\\\"')
-        
+
+        if resrun:
+            resrun =resrun.replace("\\","\\\\")
+            resrun =resrun.replace("\"",'\\\"')
         rescompil =rescompil.replace("\\","\\\\")                        
         rescompil =rescompil.replace("\"",'\\\"')
                                                  
+        #if not resrun:
+        #    resrun = '此程序已运行完毕，无输出数据。'
+        #if resReturnCode == 1:
+        #    rescompil="运行超时"
+            
         result="{\"target\":\"runpy\",\"resrun\":\""+resrun+"\",\"rescomp\":\""+rescompil+"\"}"
         return result
-    #else:
-    #    code = default_py_code
-    #    resrun = 'No result!'
-    #    rescompil = "No compilation for Python"
-
-    #    return render_template("main.html",
-    #                       code=code,
-    #                       target="runpy",
-    #                       resrun=resrun,
-    #                       rescomp=rescompil,#"No compilation for Python",
-    #                       rows=default_rows, cols=default_cols)
-
 
 if __name__ == "__main__":
     app.run()
