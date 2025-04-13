@@ -125,6 +125,10 @@ class RunPyCode(object):
             self.stdout=result.stdout
             self.stderr=result.stderr
 
+        except subprocess.TimeoutExpired:               #命令执行超时
+            self.stdout=""
+            self.stderr="命令执行超时"
+
         except FileNotFoundError:
             self.stdout=""
             self.stderr="命令不存在"
@@ -136,10 +140,6 @@ class RunPyCode(object):
         except Exception as e:                          #异常情况
             self.stdout=""
             self.stderr= e.stderr+e.output
-
-        except subprocess.TimeoutExpired:               #命令执行超时
-            self.stdout=""
-            self.stderr="命令执行超时"
 
     def run_py_code(self, code=None):
         filename = "./running/a.py"                     #文件名
