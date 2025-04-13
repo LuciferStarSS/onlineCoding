@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+ from flask import Flask, render_template, request
 from runcode import runcode
 from flask_cors import CORS
 
@@ -30,7 +30,7 @@ default_py_code = """import sys
 import os
 
 if __name__ == "__main__":
-    print "Hello Python World!!"
+    print ("Hello Python World!!")
 """
 
 #default_rows = "15"
