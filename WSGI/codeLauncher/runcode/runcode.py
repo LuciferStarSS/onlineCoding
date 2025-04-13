@@ -108,7 +108,7 @@ class RunPyCode(object):
 
     def _run_py_prog(self, cmd="a.py"):
         #cmd = [sys.executable, cmd]
-        cmd = ["E:\WSGI\codeLauncher\menv\Scripts\python.exe", cmd]         #python必须是虚拟环境下的那个版本，否则会有权限问题
+        cmd = ["E:/WSGI/codeLauncher/menv/Scripts/python.exe", cmd]         #python必须是虚拟环境下的那个版本，否则会有权限问题
         
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
