@@ -1,7 +1,6 @@
 import subprocess
 import sys
 import os
-import threading
 
 
 #处理C语言的代码
