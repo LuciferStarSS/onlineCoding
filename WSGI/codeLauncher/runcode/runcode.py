@@ -2,13 +2,13 @@ import subprocess
 import sys
 import os
 
-
 #处理C语言的代码
 class RunCCode(object):
     
-    def __init__(self, code=None, stdinData=None):
+    def __init__(self, code=None, stdinData=None, stdinArgs=None):
         self.code = code
         self.stdinData = stdinData
+        self.stdinArgs = stdinArgs
         self.compiler = "gcc"
         self.returnCode = -99;
         if not os.path.exists('running'):
@@ -23,17 +23,18 @@ class RunCCode(object):
         return result
 
     def _run_c_prog(self, cmd="./running/a.out"):       #执行编译后的程序
+        cmdArr = [cmd]
+        if self.stdinArgs:                              #程序执行时可以带参数，每个参数必须分隔开。
+            for argData in self.stdinArgs.split(' '):
+                cmdArr.append(argData)
+        
         try:
-            result = subprocess.run(cmd, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
+            result = subprocess.run(cmdArr, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
             #print(result.returncode)
             self.stdout=result.stdout
             self.stderr=result.stderr
             return result
-        except subprocess.TimeoutExpired:
-            #print("命令执行超时")
-            #self.stdout="error"
-            #self.stderr="error"
-            #return "error"
+        except subprocess.TimeoutExpired:               #运行超时
             return -99
         
     def run_c_code(self, code=None):
@@ -46,21 +47,22 @@ class RunCCode(object):
         res = self._compile_c_code(filename)            #编译代码
         result_compilation = self.stdout + self.stderr  #编译结果
         if res == 0:
-            self.returnCode=self._run_c_prog()                          #运行编译得到的程序
+            self.returnCode=self._run_c_prog()          #运行编译得到的程序
             result_run = self.stdout + self.stderr      #运行结果
         else:
             result_compilation="编译超时"
             result_run=""
             
-        return self.returnCode,result_compilation, result_run           #返回运行结果
+        return self.returnCode,result_compilation, result_run       #返回运行结果
 
 
 #处理C++语言的代码
 class RunCppCode(object):
 
-    def __init__(self, code=None, stdinData=None):
+    def __init__(self, code=None, stdinData=None, stdinArgs=None):
         self.code = code
         self.stdinData = stdinData
+        self.stdinArgs = stdinArgs
         self.compiler = "g++"
         self.returnCode = -99;
         if not os.path.exists('running'):
@@ -75,16 +77,18 @@ class RunCppCode(object):
         return result
 
     def _run_cpp_prog(self, cmd="./running/a.out"):     #执行编译后的程序
+        cmdArr = [cmd]
+        if self.stdinArgs:
+            for argData in self.stdinArgs.split(' '):
+                cmdArr.append(argData)
+
         try:
-            result = subprocess.run(cmd, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
+            result = subprocess.run(cmdArr, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
             #print(result.returncode)
             self.stdout=result.stdout
             self.stderr=result.stderr
             return result
-        except subprocess.TimeoutExpired:
-            #print("命令执行超时")
-            #self.stdout="error"
-            #self.stderr="error"
+        except subprocess.TimeoutExpired:               #运行超时
             return -99
 
     def run_cpp_code(self, code=None):
@@ -97,31 +101,37 @@ class RunCppCode(object):
         res = self._compile_cpp_code(filename)          #编译代码
         result_compilation = self.stdout + self.stderr  #编译结果
         if res == 0:
-            self.returnCode=self._run_cpp_prog()                        #运行编译得到的程序
+            self.returnCode=self._run_cpp_prog()        #运行编译得到的程序
             result_run = self.stdout + self.stderr      #运行结果
         else:
             result_compilation="编译超时"
             result_run=""
-        return self.returnCode,result_compilation, result_run           #返回运行结果
+        return self.returnCode,result_compilation, result_run   #返回运行结果
 
 
 #处理Python语言的代码
 class RunPyCode(object):
     
-    def __init__(self, code=None, stdinData=None):
+    def __init__(self, code=None, stdinData=None, stdinArgs=None):
         self.code = code
         self.stdinData = stdinData 
+        self.stdinArgs = stdinArgs
         if not os.path.exists('running'):
             os.mkdir('running')
 
-    def _run_py_prog(self, cmd="a.py"):
-        #cmd = [sys.executable, cmd]                                        #命令行下正常，WSGI下异常，会收到[mpm_winnt:crit]的错误信息：
-                                                                            # AH02965: Child: UnaBle to retrieve my generation from the parent
-        cmd = ["E:/WSGI/codeLauncher/menv/Scripts/python.exe", cmd]         #python必须是虚拟环境下的那个版本，否则会有权限问题
+    def _run_py_prog(self, cmd="./running/a.py"):
+        #cmdArr = ["./menv/Scripts/python.exe", cmd ]
+        cmdArr = ["d:/network/codeLauncher/menv/Scripts/python.exe", cmd ] #这里用相对路径，有时候可以，有时候不行，很奇怪。
+        if self.stdinArgs:
+            for argData in self.stdinArgs.split(' '):
+                cmdArr.append(argData)
+                
+        #cmd = [sys.executable, cmd]                    #命令行下正常，WSGI下异常，会收到[mpm_winnt:crit]的错误信息：
+                                                        # AH02965: Child: UnaBle to retrieve my generation from the parent
+        #cmdArr = ["./menv/Scripts/python.exe", cmd]        #python必须是虚拟环境下的那个版本，否则会有权限问题
 
         try:
-            result = subprocess.run(cmd, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
-            #print(result.returncode)
+            result = subprocess.run(cmdArr, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
             self.stdout=result.stdout
             self.stderr=result.stderr
 
@@ -139,7 +149,7 @@ class RunPyCode(object):
 
         except Exception as e:                          #异常情况
             self.stdout=""
-            self.stderr= e.stderr+e.output
+            self.stderr= e.stderr + e.output
 
     def run_py_code(self, code=None):
         filename = "./running/a.py"                     #文件名
