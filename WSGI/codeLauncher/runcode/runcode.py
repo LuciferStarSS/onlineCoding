@@ -120,15 +120,13 @@ class RunPyCode(object):
             os.mkdir('running')
 
     def _run_py_prog(self, cmd="./running/a.py"):
-        #cmdArr = ["./menv/Scripts/python.exe", cmd ]
-        cmdArr = ["d:/network/codeLauncher/menv/Scripts/python.exe", cmd ] #这里用相对路径，有时候可以，有时候不行，很奇怪。
+        #cmdArr = [sys.executable, cmd]                 #命令行下正常，WSGI下异常，会收到[mpm_winnt:crit]的错误信息：
+                                                        # AH02965: Child: UnaBle to retrieve my generation from the parent
+        #cmdArr = ["./menv/Scripts/python.exe", cmd ]   #python必须是虚拟环境下的那个版本，否则会有权限问题
+        cmdArr = ["./menv/Scripts/python.exe", cmd ]    #修改main.wsgi，使用chdir后，这里就能用相对路径了。
         if self.stdinArgs:
             for argData in self.stdinArgs.split(' '):
                 cmdArr.append(argData)
-                
-        #cmd = [sys.executable, cmd]                    #命令行下正常，WSGI下异常，会收到[mpm_winnt:crit]的错误信息：
-                                                        # AH02965: Child: UnaBle to retrieve my generation from the parent
-        #cmdArr = ["./menv/Scripts/python.exe", cmd]        #python必须是虚拟环境下的那个版本，否则会有权限问题
 
         try:
             result = subprocess.run(cmdArr, input=self.stdinData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
