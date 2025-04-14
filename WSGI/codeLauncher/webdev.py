@@ -11,16 +11,17 @@ def runc():
     #if request.method == 'POST':
         code = request.form['code']                     #code：表单中提交的C语言源代码
         stdinData = request.form['data']                #data：表单中提交的程序运行后需要输入的数据
-        run = runcode.RunCCode(code, stdinData)          #创建处理C语言的对象
-        resReturnCode,rescompil, resrun = run.run_c_code()            #运行C语言源代码
+        stdinArgs = request.form['args']                #data：表单中提交的程序运行后需要输入的数据
+        run = runcode.RunCCode(code, stdinData, stdinArgs) #创建处理C语言的对象
+        resReturnCode,rescompil, resrun = run.run_c_code() #运行C语言源代码
                                                         #后期考虑是否要添加运行时的命令行参数        
-        resrun =resrun.replace("\\","\\\\")             #由于数据要以JSON的形式返回给JS，所以要对斜杠和双引号进行转义
-        resrun =resrun.replace("\"",'\\\"')        
-        rescompil =rescompil.replace("\\","\\\\")                        
-        rescompil =rescompil.replace("\"",'\\\"')
-
-        #if resrun=="":
-        #    resrun = '此程序已运行完毕，无输出数据。'
+        
+        if resrun:                                      #由于数据要以JSON的形式返回给JS，所以要对斜杠和双引号进行转义
+            resrun =resrun.replace("\\","\\\\")
+            resrun =resrun.replace("\"",'\\\"')
+        if rescompil:
+            rescompil =rescompil.replace("\\","\\\\")                        
+            rescompil =rescompil.replace("\"",'\\\"')
 
         if resReturnCode == -99:
             rescompil="运行超时"
@@ -34,16 +35,17 @@ def runcpp():
     #if request.method == 'POST':
         code = request.form['code']
         stdinData = request.form['data']
-        run = runcode.RunCppCode(code, stdinData)
+        stdinArgs = request.form['args']                #data：表单中提交的程序运行后需要输入的数据
+        run = runcode.RunCppCode(code, stdinData, stdinArgs)
         resReturnCode,rescompil, resrun = run.run_cpp_code()
         
-        resrun =resrun.replace("\\","\\\\")
-        resrun =resrun.replace("\"",'\\\"')        
-        rescompil =rescompil.replace("\\","\\\\")                        
-        rescompil =rescompil.replace("\"",'\\\"')
-
-        #if not resrun:
-        #    resrun = '此程序已运行完毕，无输出数据。'
+        if resrun:
+            resrun =resrun.replace("\\","\\\\")
+            resrun =resrun.replace("\"",'\\\"')
+        if rescompil:
+            rescompil =rescompil.replace("\\","\\\\")                        
+            rescompil =rescompil.replace("\"",'\\\"')
+            
         if resReturnCode == -99:
             rescompil="运行超时"
             
@@ -56,19 +58,16 @@ def runpy():
     #if request.method == 'POST':
         code = request.form['code']
         stdinData = request.form['data']
-        run = runcode.RunPyCode(code, stdinData)
+        stdinArgs = request.form['args']                #data：表单中提交的程序运行后需要输入的数据
+        run = runcode.RunPyCode(code, stdinData, stdinArgs)
         rescompil, resrun = run.run_py_code()
 
         if resrun:
             resrun =resrun.replace("\\","\\\\")
             resrun =resrun.replace("\"",'\\\"')
-        rescompil =rescompil.replace("\\","\\\\")                        
-        rescompil =rescompil.replace("\"",'\\\"')
-                                                 
-        #if not resrun:
-        #    resrun = '此程序已运行完毕，无输出数据。'
-        #if resReturnCode == 1:
-        #    rescompil="运行超时"
+        if rescompil:
+            rescompil =rescompil.replace("\\","\\\\")                        
+            rescompil =rescompil.replace("\"",'\\\"')
             
         result="{\"target\":\"runpy\",\"resrun\":\""+resrun+"\",\"rescomp\":\""+rescompil+"\"}"
         return result
