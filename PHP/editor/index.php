@@ -45,18 +45,12 @@ if __name__ == "__main__":
 </div>
 <div id="content">
     <!-- ************  CODING ZONE  ************ -->
+    <form method="post" action="?a=runc">
     <div id="code">
-        <form method="post" action="?a=runc">
             <div id="title-code" class="head-section">
-              Source Code
+              源代码
             </div>
 
-            <div style="
-    position: absolute;
-    right: 260px;
-">模拟输入：<textarea id="inputdata" class="head-section" /></textarea></div>
-
-            <input id="launch-button" class="head-section" type=button onclick="goLaunching()" value="Launch" />
             
 <textarea id="text-code" name="code" rows=15 cols=60>
 <?php
@@ -68,28 +62,27 @@ echo htmlspecialchars($demo_source[$type]);
 ?> 
 </div>
 
-        </form>
+
     </div>
     
     <!-- ************ RUNNING ZONE RESULTS ************ -->
     
     <div id="result">
-        <div id="title-result" class="head-section">
-            Output result
-        </div>
-        
-        <textarea id="text-result" rows="18" cols="70" readonly>No result!</textarea>
-
+        <div style="position: relative;top: 0px;height: 5%;font-weight: bold;">命令行参数：<input style="position: absolute;left: 90px;width: 270px;" id="inputargs" class="head-section" /></div>
+        <div style="position: relative;top: 6px;height: 6%;font-weight: bold;">模拟输入：<textarea  style="position: absolute;left: 90px;width: 272px;" id="inputdata" class="head-section" /></textarea></div>
+        <input style="position: absolute;right: 121px;left: 380px;top: 19px;height: 50px;width: 60px;;"id="launch-button" class="head-section" type=button onclick="goLaunching()" value="运行" />
+        <div style="position: relative;top: 19px;height: 2%;" id="title-result" class="head-section">运行结果</div>
+        <textarea style=" height: 69%;   position: relative;top: 42px;" id="text-result" rows="18" cols="70" readonly>无输出</textarea>
     </div>
-    
+    </form>
     <!-- ************ COMPILATION RESULTS ZONE ************ -->
     
     <div id="compile">
         <div id="title-compile" class="head-section">
-            Compilation / Output
+            编译/输出信息
         </div>
         
-<textarea id="text-compile" rows="7" cols="140" readonly></textarea>
+        <textarea id="text-compile" rows="7" cols="140" readonly></textarea>
 
     </div>
 </div>
@@ -116,9 +109,8 @@ echo htmlspecialchars($demo_source[$type]);
 
 <script>
 function goLaunching()
-{  
-   //指向WSGI服务器
-   $.post("http://192.168.1.103:81/run<?php echo $type;?>", { "code": editor.getValue(),"data":$("#inputdata")[0].value}, function (data) {
+{
+   $.post("http://192.168.3.112:81/run<?php echo $type;?>", { "code": editor.getValue(),"data":$("#inputdata")[0].value, "args":$("#inputargs")[0].value}, function (data) {
       data=data.replaceAll("\r","\\r");
       data=data.replaceAll("\n","\\n");
       var jsonData=JSON.parse(data);
