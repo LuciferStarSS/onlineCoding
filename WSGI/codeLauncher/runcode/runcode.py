@@ -54,18 +54,18 @@ class RunCCode(object):
         filename = self.filePath+"/"+self.postUN+"_"+self.postPN    #代码的文件名（不带扩展名）
         if not code:
             code = self.postCode
-        result_run = "程序未运行"
+        result_run = "出错：程序未运行"
         with open(filename+".c", "w") as f:
             f.write(code)                                           #保存代码
-        res = self._compile_c_code(filename+".c",filename+"_c.out") #编译代码，并输出到指定路径
+        returnCode = self._compile_c_code(filename+".c",filename+"_c.out") #编译代码，并输出到指定路径
         result_compilation = self.stdout + self.stderr              #编译结果
-        if res == 0:
-            self.returnCode=self._run_c_prog(filename+"_c.out")     #运行编译得到的程序
+        if res == 0:                                                #编译成功
+            returnCode=self._run_c_prog(filename+"_c.out")          #运行编译得到的程序
             result_run = self.stdout + self.stderr                  #运行结果
-        else:
-            result_compilation="编译异常"                           #编译异常，测试时不曾捕捉到该类情况
-            result_run=""
-        return self.returnCode,result_compilation, result_run       #返回运行结果
+        #else:                                                      #编译出错，则直接输出
+        #    result_compilation="编译异常"
+        #    result_run=""
+        return returnCode,result_compilation, result_run            #返回运行结果
 
 
 #处理C++语言的代码
@@ -82,7 +82,7 @@ class RunCppCode(object):
         self.compiler = "g++"
         self.returnCode = -99;
         self.filePath = "./works/"+self.postCID+"/"+self.postDD
-        
+
         if not os.path.exists(self.filePath):
             path=Path(self.filePath)
             path.mkdir(parents=True)
@@ -102,7 +102,6 @@ class RunCppCode(object):
                 cmdArr.append(argData)
         try:
             result = subprocess.run(cmdArr, input=self.postData, capture_output=True,text=True,check=True,timeout=3)  # 设置超时时间为3秒
-            #print(result.returncode)
             self.stdout=result.stdout
             self.stderr=result.stderr
             return result
@@ -113,18 +112,15 @@ class RunCppCode(object):
         filename = self.filePath+"/"+self.postUN+"_"+self.postPN    #文件名
         if not code:
             code = self.postCode
-        result_run = "No run done"
+        result_run = "出错：程序未运行"
         with open(filename+".cpp", "w") as f:
             f.write(code)                                           #保存代码
-        res = self._compile_cpp_code(filename+".cpp", filename+"_cpp.out")  #编译代码
+        returnCode = self._compile_cpp_code(filename+".cpp", filename+"_cpp.out")  #编译代码
         result_compilation = self.stdout + self.stderr              #编译结果
-        if res == 0:
-            self.returnCode=self._run_cpp_prog(filename+"_cpp.out")        #运行编译得到的程序
+        if returnCode == 0:                                         #编译成功
+            returnCode=self._run_cpp_prog(filename+"_cpp.out")      #运行编译得到的程序
             result_run = self.stdout + self.stderr                  #运行结果
-        else:
-            result_compilation="编译超时"
-            result_run=""
-        return self.returnCode,result_compilation, result_run       #返回运行结果
+        return returnCode,result_compilation, result_run            #返回运行结果
 
 
 #处理Python语言的代码
