@@ -59,7 +59,7 @@ class RunCCode(object):
             f.write(code)                                           #保存代码
         returnCode = self._compile_c_code(filename+".c",filename+"_c.out") #编译代码，并输出到指定路径
         result_compilation = self.stdout + self.stderr              #编译结果
-        if res == 0:                                                #编译成功
+        if returnCode == 0:                                                #编译成功
             returnCode=self._run_c_prog(filename+"_c.out")          #运行编译得到的程序
             result_run = self.stdout + self.stderr                  #运行结果
         #else:                                                      #编译出错，则直接输出
