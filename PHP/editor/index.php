@@ -2,6 +2,25 @@
 $type=isset($_GET['t'])?$_GET['t']:"";
 $type=$type==""?"c":$type;
 
+$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:exit("请先登录。");
+$classid=isset($_COOKIE["CLASSID"])?$_COOKIE["CLASSID"]:exit("请先登录。");
+$gradeid=isset($_COOKIE["GRADEID"])?$_COOKIE["GRADEID"]:-1;
+$projname=isset($_COOKIE["PRJNAME"])?$_COOKIE["PRJNAME"]:"未命名";
+$datedir=isset($_COOKIE["DD"])?$_COOKIE["DD"]:"";
+
+
+
+//$username="test";
+$projname="第一个程序";
+include("../include/config.inc.php");
+
+$CN=isset($classname[$classid-1])?$classname[$classid-1]:exit("错误的班级信息。");
+
+if($gradeid==-1)
+{
+   $gradeid=$grades[$classid];
+}
+
 $demo_source=Array(
 "c"=>'#include <stdio.h>
 
@@ -30,10 +49,17 @@ if __name__ == "__main__":
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebDevTools</title>
+    <title>在线编程系统</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="./static/devc.css">
     <script src=./static/js/jquery.js></script>
+    <script>
+       var username='<?php echo $username;?>';
+       var classid='<?php echo $classid;?>';
+       var gradeid='<?php echo $gradeid;?>';
+       var projname='<?php echo $projname;?>';
+       var datedir='<?php echo $datedir;?>';
+    </script>
 </head>
 <body id="index" class="home">
 <div id="links">
@@ -71,7 +97,7 @@ echo htmlspecialchars($demo_source[$type]);
         <div style="position: relative;top: 0px;height: 5%;font-weight: bold;">命令行参数：<input style="position: absolute;left: 90px;width: 270px;" id="inputargs" class="head-section" /></div>
         <div style="position: relative;top: 6px;height: 6%;font-weight: bold;">模拟输入：<textarea  style="position: absolute;left: 90px;width: 272px;" id="inputdata" class="head-section" /></textarea></div>
         <input style="position: absolute;right: 121px;left: 380px;top: 19px;height: 50px;width: 60px;;"id="launch-button" class="head-section" type=button onclick="goLaunching()" value="运行" />
-        <div style="position: relative;top: 19px;height: 2%;" id="title-result" class="head-section">运行结果</div>
+        <div style="position: relative;top: 19px;height: 2%;left:0px" id="title-result" class="head-section">运行结果</div>
         <textarea style=" height: 69%;   position: relative;top: 42px;" id="text-result" rows="18" cols="70" readonly>无输出</textarea>
     </div>
     </form>
@@ -110,7 +136,19 @@ echo htmlspecialchars($demo_source[$type]);
 <script>
 function goLaunching()
 {
-   $.post("http://192.168.3.112:81/run<?php echo $type;?>", { "code": editor.getValue(),"data":$("#inputdata")[0].value, "args":$("#inputargs")[0].value}, function (data) {
+   var username='<?php echo $username;?>';
+   var classid='<?php echo $classid;?>';
+   var classname='<?php echo $CN;?>';
+   var gradeid='<?php echo $gradeid;?>';
+   var projname='<?php echo $projname;?>';
+   var datedir='<?php echo $datedir;?>';
+   var data=$("#inputdata")[0].value;
+   var args=$("#inputargs")[0].value;
+
+   $("#text-result").text("");
+   $("#text-compile").text("");
+   
+   $.post("http://127.0.0.1:81/run<?php echo $type;?>", {"UN":username,"CID":classname,"PN":projname, "DD":datedir, "CODE": editor.getValue(),"DATA":data, "ARGS":args}, function (data) {
       data=data.replaceAll("\r","\\r");
       data=data.replaceAll("\n","\\n");
       var jsonData=JSON.parse(data);
