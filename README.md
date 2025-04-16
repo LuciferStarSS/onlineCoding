@@ -18,3 +18,7 @@ An online C/C++/Python coding platform.
 更新：just_PHP
 该版本，只用了PHP，不再需要在Apache2中配置WSGI。
 以后只维护这个版本了。
+
+
+P.S.
+此项目是放在scratch_for_class教学平台里用的，所以有一个“../include/config.inc.php”的引用。
