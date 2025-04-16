@@ -13,3 +13,8 @@ An online C/C++/Python coding platform.
 2.添加了对命令行参数的支持。
 
 具体部署，请查阅文档：onlineCoding在线编程平台部署.docx
+
+
+更新：just_PHP
+该版本，只用了PHP，不再需要在Apache2中配置WSGI。
+以后只维护这个版本了。
