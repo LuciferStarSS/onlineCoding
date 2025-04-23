@@ -62,44 +62,51 @@ function runCMD($command, $stdInput="",$CHECK_TIMEOUT=false){
       fclose($pipes[2]);
       proc_close($process);      			//关闭管道资源
       if($bTimeOut)				//如果超时
-         return Array(0=>-1,"resrun"=>$output,"rescomp"=>"程序运行已超过 ".TIMEOUT." 秒，被终止运行，当前得到的运行结果可能不完整。");
+         return Array(0=>-3,"程序运行已超过 ".TIMEOUT." 秒，被强行终止");
       if (!empty($error_output))      		//打印错误输出（如果有）
-         return Array(0=>-1,"resrun"=>$output,"rescomp"=>$error_output);
+         return Array(0=>-2,$error_output);
       else
          return Array(0=>0,"resrun"=>$output,"rescomp"=>$error_output);
    }
    else {
-      return Array(0=>-1,"resrun"=>$output,"rescomp"=>"启动进程失败");
+      return Array(0=>-1,"启动编译器失败。");
    }
 }
 
 //编译和运行C代码
 function runCCode($filename,$code,$input,$args) {
    $code=iconv("UTF-8","GBK",$code);
-   saveCode($filename,$code);
+   //saveCode($filename,$code);
    $strCMD="gcc ".$filename." -Wall -o ".$filename.".exe";	//python的subprocess可以执行.out，PHP的不行。
    $retArray=runCMD($strCMD,"",true);
-
+var_dump($retArray);
    if($retArray[0]==0)
        $retArray=runCMD($filename.".exe".($args?" ".$args:""),$input,true);	//执行的时候，
+   else return Array(-99,"超时");
    									//    如果有参数，就附加到待执行程序后；
    return $retArray;							//    如果有输入，就作为第二个参数传递。
 }
 
 //编译和运行C++代码
-function runCPPCode($filename,$code,$input,$args) {
-   $code=iconv("UTF-8","GBK",$code);
-   saveCode($filename,$code);
-   $strCMD="g++ ".$filename." -Wall -o ".$filename.".exe";	//python的subprocess可以执行.out，PHP的不行。
-   $retArray=runCMD($strCMD,"",true);
-   if($retArray[0]==0)
+function runCPPCode($filename,$code,$input,$args,$compile) {
+   if($compile==1)//第一次要编译一下，后面就不需要了。
+   {
+      $code=iconv("UTF-8","GBK",$code);
+      saveCode($filename,$code);
+      $strCMD="g++ ".$filename." -Wall -o ".$filename.".exe";	//python的subprocess可以执行.out，PHP的不行。
+      $retArray=runCMD($strCMD,"",true);
+      if($retArray[0]==0)
+         $retArray=runCMD($filename.".exe".($args?" ".$args:""),$input,true);
+   }
+   else
        $retArray=runCMD($filename.".exe".($args?" ".$args:""),$input,true);
+
    return $retArray;
 }
 
 //运行Python代码
 function runPythonCode($filename,$code,$input,$args){
-   saveCode($filename,$code);
+   //saveCode($filename,$code);
    $strCMD="python.exe ".$filename.($args?" ".$args:"");	
    $retArray=runCMD($strCMD,$input,true);
    return $retArray;
@@ -184,9 +191,54 @@ function convertMixedToUtf8($str) {
     return $result;
 }
 
+function evaluateCode($TKID,$filename,$strCODE,$strARGS)
+{
+   $scoreStr="";
+   $score=0;
+   $evaluateCounter=0;
+   $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$TKID.DIRECTORY_SEPARATOR."checking".DIRECTORY_SEPARATOR;
+
+   if ($handle = opendir($add))
+   {
+      while (false !== ($file = readdir($handle)))
+      {
+         if ($file!="." && $file!=".." && is_dir($add.$file))
+         {
+            $evaluateCounter++;
+            $strINPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."input.txt");
+            $strOUTPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."output.txt");
+            $retArr=runCPPCode($filename,$strCODE,$strINPUT,$strARGS,$evaluateCounter);
+
+            if($evaluateCounter==1)//第一轮，编译通过分
+            {
+               if($retArr[0]==0) {							//编译成功，得10分，但要放在最后加。
+                  $scoreStr.="代码编译运行成功，得10分。\r\n";
+               }
+               else{
+                  $scoreStr.="代码编译失败，不得分。\r\n";
+                  return Array(0,"编译不通过：".$retArr[1]."，得0分。");		//$retArr[1]为-3，表示编译通过，但运行超时。
+               }
+            }
+
+            $scoreStr.="样例评估第 ".$evaluateCounter." 轮：\r\n";
+
+            if($retArr[0]==0 && $retArr["resrun"]==$strOUTPUT)  
+            {
+               $score+=90;
+               $scoreStr.="程序运行样例“".$file."”结果正确，得90分。\r\n";		//运行结果与预期值一致，得90分。
+            }
+            else $scoreStr.="程序运行样例“".$file."”结果不正确，不得分。\r\n";	//运行结果与预期值不一致，得0分。
+         }
+      }
+      closedir($handle); 
+      $score/=$evaluateCounter;								//多轮样例得分取平均值
+      $score+=10;									//编译通过，得10分。
+      $scoreStr.="本题综合得分：".$score;
+   }
+   return Array($score/$evaluateCounter,$scoreStr);
+}
 
 include "../include/config.inc.php";
-var_dump($taskID);
 
 if($strCODE && $taskID){
    $retArr=Array();
@@ -201,7 +253,8 @@ if($strCODE && $taskID){
 
       case "cpp":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".cpp";
-         $retArr=runCPPCode($filename,$strCODE,$strINPUT,$strARGS);
+
+         $retArr=evaluateCode($taskID,$filename,$strCODE,$strINPUT,$strARGS);
       break;
 
       case "py":
@@ -209,7 +262,7 @@ if($strCODE && $taskID){
          $retArr=runPythonCode($filename,$strCODE,$strINPUT,$strARGS);
       break;
    }
-   echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['resrun'])."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);
+   echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr[1]);
 
 }
 ?>
