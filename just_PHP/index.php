@@ -1,116 +1,110 @@
-<?php
-$type=isset($_GET['t'])?$_GET['t']:"";
-$type=$type==""?"c":$type;
+﻿<?php
+   $type=isset($_GET['t'])?$_GET['t']:"";
+   $type=$type==""?"c":$type;
 
-$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:exit("请先登录。");
-$classid=isset($_COOKIE["CLASSID"])?$_COOKIE["CLASSID"]:exit("请先登录。");
-$gradeid=isset($_COOKIE["GRADEID"])?$_COOKIE["GRADEID"]:-1;
-$projname=isset($_COOKIE["PRJNAME"])?$_COOKIE["PRJNAME"]:"未命名";
-$datedir=isset($_COOKIE["DD"])?$_COOKIE["DD"]:"";
+$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:header("Location: /class/");
+include "../include/config.inc.php";
+$room=1;
 
-
-
-//$username="test";
-$projname="第一个程序";
-include("../include/config.inc.php");
-
-$CN=isset($classname[$classid-1])?$classname[$classid-1]:exit("错误的班级信息。");
-
-if($gradeid==-1)
-{
-   $gradeid=$grades[$classid];
-}
-
-$demo_source=Array(
-"c"=>'#include <stdio.h>
-
-int main(int argc, char **argv)
-{
-    printf("Hello C World!!\\n");
-    return 0;
-}',
-"cpp"=>'#include <iostream>
-
-using namespace std;
-
-int main(int argc, char **argv)
-{
-    cout << "Hello C++ World" << endl;
-    return 0;
-}',
-"py"=>'import sys
-import os
-
-if __name__ == "__main__":
-    print ("Hello Python World!!")
-',
-);
-?>
-<!DOCTYPE html>
-<html>
+?><!DOCTYPE html>
+<html lang=zh-cn>
 <head>
-    <title>在线编程系统</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" href="./static/devc.css">
-    <script src=./static/js/jquery.js></script>
-    <script>
-       var username='<?php echo $username;?>';
-       var classid='<?php echo $classid;?>';
-       var gradeid='<?php echo $gradeid;?>';
-       var projname='<?php echo $projname;?>';
-       var datedir='<?php echo $datedir;?>';
-       var classname='<?php echo $CN;?>';
-
-    </script>
+<meta http-equiv="X-UA-Compatible" content="IE=IE10">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<title>在线编程系统</title>
+<link rel="stylesheet" type="text/css" href="./static/devc.css">
+<script>
+   var username='<?php echo $username;?>';
+   var classname='';
+   var ext='';//<?php echo $type;?>';
+   var taskID=0;
+</script>
+<script src=./static/js/jquery.js></script>
 </head>
-<body id="index" class="home">
-<div id="links">
-<ul>
-<li><a href="?t=">C 语言</a></li>
-<li><a href="?t=cpp">C++ 语言</a></li>
-<li><a href="?t=py">Python 语言</a></li>
-</ul>
-</div>
-<div id="docs" style="position: absolute;top: 14px;left: 276px;">
-<select id=class onchange="getFolders(this)"></select>
-<select id=folders onchange="getFiles(this);"></select>
-<select id=files onchange="getFile(this)"></select>
-</div>
-<div id="content">
-    <!-- ************  CODING ZONE  ************ -->
-    <form method="post" action="?a=runc">
-    <div id="code">
-        <div id="title-code" class="head-section">源代码</div>
-        <textarea id="text-code" name="code" rows=15 cols=60><?php
-echo htmlspecialchars($demo_source[$type]);
-?>
-        </textarea><br/>
-        <div id="text-code-ace" class="hidden"><?php
-echo htmlspecialchars($demo_source[$type]);
-?> 
-        </div>
+<body>
+<div align=center>
+<div style="width: 100%;max-width: 1338px;margin-left:5px">
+  <div align=center>
+    <div alignstyle="0" style="border-radius: 3%;width: 100%;min-width:666px;height: 90px;">
+      <div  align="center" style="font-size:20;width:100%;overflow:auto;"><h1>C/C++/Python编程平台</h1></div>
     </div>
-    
-    <!-- ************ RUNNING ZONE RESULTS ************ -->
-    
-    <div id="result">
-        <div style="position: relative;top: 0px;height: 5%;font-weight: bold;">命令行参数：<input style="position: absolute;left: 90px;width: 270px;" id="inputargs" class="head-section" /></div>
-        <div style="position: relative;top: 6px;height: 6%;font-weight: bold;">模拟输入：<textarea  style="position: absolute;left: 90px;width: 272px;" id="inputdata" class="head-section" /></textarea></div>
-        <input style="position: absolute;right: 121px;left: 380px;top: 19px;height: 50px;width: 60px;;"id="launch-button" class="head-section" type=button onclick="goLaunching()" value="运行" title="保存并运行"/>
-        <div style="position: relative;top: 19px;height: 2%;left:0px" id="title-result" class="head-section">运行结果</div>
-        <textarea style=" height: 69%;   position: relative;top: 42px;" id="text-result" rows="18" cols="70" readonly>无输出</textarea>
+    <div style="float:left;width: 100%;max-width: 1338px; margin-top:0px;margin-bottom:10px;min-width: 650px;">
+      <div style="background:darkgray;height: 21px;">
+        <select id=class onchange="getClass(this.value)" title="教师可巡查多个班级，学生只显示自己的班级。" style="
+    position: relative;
+    left: -183px;
+"><option value="">请选择班级</option><?php
+for($i=0;$i<count($class_room[$room]);$i++)
+{
+   echo "<option value=\"".$classname[$class_room[$room][$i]-1]."\">".$classname[$class_room[$room][$i]-1]."</option>";
+}
+        ?></select>
+        <div style="position: relative;top: -20px;width:270px;height: 320px;">
+           <input type=text id=INPUT_TKID style="position: absolute;left:0px;visibility:hidden" onclick="showTaskList()" placeholder="输入编号后敲回车也可打开">
+           <div id=TASKLIST style="position: absolute;left: 0px;top: 25px;height:200px;visibility:hidden;z-index: 10;overflow: overlay;max-height: 170px;background: chocolate;"></div>
+         </div>
+        <!--select id=TKID onclick="getTasks(this.value);" style="visibility:hidden" title="不同的年级可以显示不同的试题。"><option value="">请选择练习题</option></select-->
+        <select id=EXT onchange="getFile(this.value);" style="visibility: hidden;position: relative;top: -340px;left: 90px;" title="如果之前提交过某一语言的源码，则可以直接打开。"><option value="">请选择语言</option><option value="c">C</option><option value="cpp">C++</option><option value="py">Python</option></select>
+      </div>
     </div>
-    </form>
-    <!-- ************ COMPILATION RESULTS ZONE ************ -->
-    
-    <div id="compile">
-        <div id="title-compile" class="head-section">
-            编译/输出信息
-        </div>
-        
-        <textarea id="text-compile" rows="7" cols="140" readonly></textarea>
 
+    <!--左侧-->
+    <div style="float:left;width: 666px;height:705px;margin-right: 6px;margin-bottom: 10px;background:beige ;/* margin-left: 10px; */">
+      <div alignstyle="0" style="width: 650px;height: 442px;left: 0px;top:6px;position: relative;">
+        <!--预设任务分发-->
+        <div style="text-align: left;">问题：</div>
+        <textarea id=question readonly></textarea>
+        <div style="position: absolute;width: 300px;">
+          <div style="text-align: left;">输入样例：</div>
+          <textarea type=text id="demoinput" readonly></textarea>
+        </div>
+        <div   style="position: absolute;width: 300px;left: 331px;">
+          <div style="text-align: left;">输出样例：</div>
+          <textarea readonly id="demooutput"></textarea>
+        </div>
+        <!--预设任务分发-->
+        <div style="position: relative;top: 200px;">
+          <div style="text-align: left;">操作说明：<br>
+            1.依次选择班级、习题和编程语言种类后，如果之前提交过代码，则会自动调取并显示代码；<br>
+            2.代码编写完成后，在运行前，可以根据需要设置“执行参数”和“数据输入”；<br>
+            3.可以根据“编译结果”排查代码中的错误；<br>
+            4.如果代码正确，且程序有结果输出，则会显示在“输出结果”中；<br>
+            5.每个程序最多执行3秒钟，如算法过于复杂而超时，将不能得到正确的结果。</div>
+        </div>
+      </div>
     </div>
+    <!--左侧-->
+
+    <!--右侧-->
+    <div alignstyle="0" style="float:left;width: 666px;height: 705px;position:relative;background: beige;">
+      <div alignstyle="0" style="width: 650px;height: 442px;left: 0px;top:6px;position: relative;">
+        <div style="text-align: left;">源代码：</div>
+        <textarea id="text-code"></textarea>
+        <div id="text-code-ace" class="hidden"></div>
+        <div style="width: 310px;top: 432px;/* left: 50px; */position:absolute;">
+          <div style="text-align: left;">执行参数：</div>
+          <input type=text id="inputargs">
+          <div style="text-align: left;">数据输入：</div>
+          <textarea  id="inputdata"></textarea>
+          <input type=button id="launch-button" value="保存&测试" onclick="checkCode();" style="position: relative;top: 5px;width:305px;height: 30px;font-size: 14px;font-weight: bolder;">
+          <input type=button id="launch-button" value="判分" onclick="evaluateCode();" style="position: relative;top: 14px;width: 305px;height: 35px;font-size: 18px;font-weight: bolder;">
+        </div>
+        <div style="width: 310px;left: 318px;top: 432px;position: absolute;">
+          <div style="text-align: left;">编译结果：</div>
+          <textarea id="compile" readonly></textarea>
+          <div style="text-align: left;">输出结果：</div>
+          <textarea id="result" readonly></textarea>
+        </div>
+      </div>
+    </div>
+    <!--右侧-->
+  </div>
+<!--其它-->
+  <div style="float:left;width: 100%;max-width: 1338px; margin-top:10px; /* margin-right: 650px; */ margin-bottom:10px; min-width: 650px;">
+     <div style="background:darkgray;text-align:center">Copyright</div>
+  </div>
+</div>
 </div>
 <script src="./static/ace/ace.js"></script>
 <script>
@@ -134,103 +128,187 @@ echo htmlspecialchars($demo_source[$type]);
 </script>
 
 <script>
-function goLaunching()
+
+//响应回车
+document.addEventListener('keydown',function (event){
+   if(event.keyCode == 13){
+      if(document.getElementById("INPUT_TKID").value)
+         getTasks(document.getElementById("INPUT_TKID").value);
+   }
+});
+
+
+function hideTaskList()
+{
+   var oTASKLIST=document.getElementById("TASKLIST").style.visibility="hidden";
+}
+
+function showTaskList()
+{
+   var oTASKLIST=document.getElementById("TASKLIST");
+
+   if(oTASKLIST.style.visibility=="visible")
+      oTASKLIST.style.visibility="hidden";
+   else
+      oTASKLIST.style.visibility="visible";
+   //oTASKLIST.style.visibility="visible";
+   oTASKLIST.innerHTML="";
+   getTasks("");
+}
+
+//整理界面
+function doCleaning()
+{
+   document.getElementById("compile").value="";
+   document.getElementById("result").value="";
+}
+
+
+//保存、编译和运行源代码
+function checkCode()
+{
+   var data=document.getElementById("inputdata").value;
+   var args=document.getElementById("inputargs").value;
+   var strCode=editor.getValue();
+
+   if(strCode=="") alert("未输入代码，无需保存。");
+   else if( data=="" && ( strCode.indexOf("cin")>0 || strCode.indexOf("scanf(")>0 || strCode.indexOf("sys.stdin")>0 ))
+   {
+      document.getElementById("inputdata").focus();
+      alert("代码中有用户输入的处理，请配置相应的运行参数。");
+   }
+   else
+   {
+      doCleaning();
+   
+      $.post("./opt/cc.php?t="+ext, {"UN":username,"CN":classname,"TKID":taskID, "CODE": strCode,"DATA":data, "ARGS":args}, function (data) {
+         var dataArr=data.split("<+-NOJSON-+>");
+         if(dataArr.length==3)
+         {
+            document.getElementById("result").value=dataArr[1];
+            document.getElementById("compile").value=dataArr[2];
+         }
+      });
+   }
+}
+
+//判分
+function evaluateCode()
 {
    var data=document.getElementById("inputdata").value;
    var args=document.getElementById("inputargs").value;
 
-   document.getElementById("text-result").value="";
-   document.getElementById("text-compile").value="";
+   if(editor.getValue()=="") alert("未输入代码，无需保存。");
 
+   doCleaning();
    
-   $.post("./opt/cc.php?t=<?php echo $type;?>", {"UN":username,"CN":classname,"PN":projname, "DD":datedir, "CODE": editor.getValue(),"DATA":data, "ARGS":args}, function (data) {
+   $.post("./opt/ec.php?t="+ext, {"UN":username,"CN":classname,"TKID":taskID, "CODE": editor.getValue(),"DATA":data, "ARGS":args}, function (data) {
       var dataArr=data.split("<+-NOJSON-+>");
-      if(dataArr.length==3)
+      if(dataArr.length==2)
       {
-         document.getElementById("text-result").value=dataArr[1];
-         document.getElementById("text-compile").value=dataArr[2];
-      }
-      //   document.getElementById("text-result").value=data;
-return;
-      data=data.replaceAll("\r","\\r");
-      data=data.replaceAll("\n","\\n");
-      var jsonData=JSON.parse(data);
-      if(jsonData)
-      {
-         //document.getElementById("text-result").value=atob(jsonData.resrun);
-         //document.getElementById("text-compile").value=atob(jsonData.rescomp);
-         document.getElementById("text-result").value=jsonData.resrun;
-         document.getElementById("text-compile").value=jsonData.rescomp;
+         document.getElementById("result").value=dataArr[1];
+         //document.getElementById("compile").value=dataArr[2];
       }
    });
 }
 
-
-function getClass()
+//获取任务列表
+function getTasks(value)
 {
-   document.getElementById("class").append(new Option("请选择班级",""));
-   document.getElementById("class").append(new Option(classname,classname));
-
-}
-
-function getFolders(o)
-{
-   if(o.value){
-      classname=o.value;
-      $.post("./opt/getFolders.php", {"C":classid, "CN":o.value}, function (data) {
+   if(value=="") 
+   {
+      $.post("./opt/getTask.php?act=all", {}, function (data) {
          var jsonData=JSON.parse(data);
          if(jsonData)
          {
-            var folders=document.getElementById("folders");
-            folders.length=0;
-            folders.append(new Option("请选择日期",""));
+            //doCleaning();
+            var oTASKLIST=document.getElementById("TASKLIST");
 
             var arrKeys=Object.keys(jsonData);
             for(i=0;i<arrKeys.length;i++)
             {
-               folders.append(new Option(jsonData[arrKeys[i]],jsonData[arrKeys[i]]));
+               var oDiv=document.createElement("DIV");
+               oDiv.innerText=jsonData[arrKeys[i]];
+               oDiv.className="listcontent";
+               oDiv.onclick=function(){
+                  getTasks(this.innerText);
+               }
+               oTASKLIST.append(oDiv);
             }
          }
       });
    }
+   else if(value!=taskID)
+   {
+      editor.setValue("");
+      taskID=value;
+      document.getElementById("EXT").style.visibility="visible";
+      getTask(taskID);
+      if(ext)
+         getFile(ext);
+   }
 }
 
-function getFiles(o)
-{
-   if(o.value){
-      datedir=o.value;
-      $.post("./opt/getFiles.php?T=<?php echo $type;?>", {"UN":username,"C":classid, "CN":classname, "DD":o.value}, function (data) {
-         var jsonData=JSON.parse(data);
-         if(jsonData)
-         {
-             var files=document.getElementById("files");
-             files.length=0;
-             files.append(new Option("请选择文件",""));
 
-             var arrKeys=Object.keys(jsonData);
-             for(i=0;i<arrKeys.length;i++)
-             {
-                files.append(new Option(jsonData[arrKeys[i]],jsonData[arrKeys[i]]));
-             }
+//获取单个任务的配置信息
+function getTask(value)
+{
+   if(value) 
+   {
+      document.getElementById("INPUT_TKID").value=value;
+      $.post("./opt/getTask.php?act=get", {"TKID":value}, function (data) {
+         var dataArr=data.split("<+-NOJSON-+>");
+         if(dataArr.length==3)
+         {
+            doCleaning();
+            document.getElementById("question").value=dataArr[0];
+            document.getElementById("demoinput").value=dataArr[1];
+            document.getElementById("demooutput").value=dataArr[2];
          }
+         else alert(data);
       });
    }
 }
 
-function getFile(o)
+
+//选好班级，显示下一级下拉选择菜单
+function getClass(value)
 {
-   if(o.value){
-      $.post("./opt/getFile.php?T=<?php echo $type;?>", {"UN":username,"C":classid, "CN":classname, "DD":datedir, "FN":o.value}, function (data) {
+   if(value){
+      classname=value;
+      document.getElementById("INPUT_TKID").style.visibility="visible";
+      document.getElementById("EXT").style.visibility="visible";
+      if(taskID && ext)
+      {
+         getFile(ext);
+      }
+   }
+}
+
+//获取提交过的源代码数据
+//如果是教师，则应该获取所有人的源代码的列表。
+function getFile(value)
+{
+   if(value){
+      hideTaskList();
+      doCleaning();
+      editor.setValue("");
+      ext=value;
+      if(taskID)
+         document.getElementById("INPUT_TKID").value=taskID;
+      $.post("./opt/getCode.php?T="+value, {"UN":username, "CN":classname, "TKID":taskID, "L":ext}, function (data) {
          //var jsonData=JSON.parse(data);
          if(data)
          {
-            editor.setValue(data);
+            if(data=="请登陆")
+               alert("登录已超时，请重新登录。");
+            else
+               editor.setValue(data);
          }
       });
    }
 }
 
-getClass();
 
 </script>
 </body>
