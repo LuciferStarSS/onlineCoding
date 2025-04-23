@@ -1,4 +1,4 @@
-﻿<?php
+<?php
    $type=isset($_GET['t'])?$_GET['t']:"";
    $type=$type==""?"c":$type;
 
@@ -230,18 +230,9 @@ function delTest()
 //新建练习任务
 function newTask()
 {
-   var oTKID=document.getElementById("TASKLIST");
-
-   var lastTaskID=oTKID.children[oTKID.children.length-1];
-   if(lastTaskID == undefined)
-   {
-      showTaskList();
-      alert("当前未获取过练习列表，请重新再执行一次本操作。");
-      //newTask();
-   }
-   else
-   {
-      $.post("./opt/editTask.php?act=new",{"TKID":(parseInt(lastTaskID.innerHTML)+1)}, function(data){
+   $.get("./opt/editTask.php?act=all", {}, function (data) {		//虽然可以变相地从TASKLIST里获取，但还是保险一点吧。
+      var lastTaskID=data[data.length-1];
+      $.post("./opt/editTask.php?act=new",{"TKID":(parseInt(lastTaskID)+1)}, function(data){
          if(data["TKID"])
          {
             taskID=data["TKID"];
@@ -257,7 +248,7 @@ function newTask()
             doTaskCleaning();
          }
       },"json");
-   }
+   },"json");
 }
 
 //保存任务
@@ -310,32 +301,17 @@ function delTask()
 function getTasks(value)
 {
    $.get("./opt/editTask.php?act=all", {}, function (data) {
-      //doTaskCleaning();
-      //var o=document.getElementById("TKID");
-      //o.length=0;
-      //o.append(new Option("请选择要编辑的任务",""));
-      //var arrKeys=Object.keys(data);
-      //for(i=0;i<arrKeys.length;i++)
-      //{
-      //   o.append(new Option(data[arrKeys[i]],data[arrKeys[i]]));
-      //}
-
-            //doCleaning();
-            var oTASKLIST=document.getElementById("TASKLIST");
-
-            //var arrKeys=Object.keys(jsonData);
-            for(i=0;i<data.length;i++)
-            {
-               var oDiv=document.createElement("DIV");
-               oDiv.innerText=data[i];
-               oDiv.className="listcontent";
-               oDiv.onclick=function(){
-                  getTask(this.innerText);
-               }
-               oTASKLIST.append(oDiv);
-            }
-
-      
+      var oTASKLIST=document.getElementById("TASKLIST");
+      for(i=0;i<data.length;i++)
+      {
+         var oDiv=document.createElement("DIV");
+         oDiv.innerText=data[i];
+         oDiv.className="listcontent";
+         oDiv.onclick=function(){
+            getTask(this.innerText);
+         }
+         oTASKLIST.append(oDiv);
+      }   
    },"json");
 }
 
