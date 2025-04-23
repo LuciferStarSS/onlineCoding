@@ -1,6 +1,7 @@
 # onlineCoding
 An online C/C++/Python coding platform.
 
+
 本项目onlineCoding中绝大部分代码源自开源项目codeLauncher ( https://github.com/dadadel/codelauncher ) 。 
 
 原项目只能在本地运行，运行后监听本地5000端口（ http://127.0.0.1:5000 ），
@@ -21,4 +22,9 @@ An online C/C++/Python coding platform.
 
 
 P.S.
+
+PHP和WSGI两个文件夹里是Python版的
+
+just_PHP是纯PHP版的。
+
 此项目是放在scratch_for_class教学平台里用的，所以有一个“../include/config.inc.php”的引用。
