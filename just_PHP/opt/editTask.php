@@ -44,7 +44,7 @@ switch($act)
       {
          while (false !== ($file = readdir($handle)))
          {
-            if ($file!="." && $file!=".." && is_dir($add.$file))
+            if ($file!="." && $file!=".." && !is_dir($add.$file))
             { 
                $list[]=$file;
             }
