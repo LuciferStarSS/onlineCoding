@@ -312,11 +312,11 @@ function evaluatePYCode($TKID,$filename,$strCODE,$strARGS)
             if($evaluateCounter==1)//第一轮，编译通过分
             {
                if($retArr[0]==0) {							//编译成功，得10分，但要放在最后加。
-                  $scoreStr.="代码编译运行成功，得10分。\r\n";
+                  $scoreStr.="代码运行成功，得10分。\r\n";
                }
                else{
-                  $scoreStr.="代码编译失败，不得分。\r\n";
-                  return Array(0,"编译不通过：".$retArr[1]."，得0分。");		//$retArr[1]为-3，表示编译通过，但运行超时。
+                  $scoreStr.="代码有错误，不得分。\r\n";
+                  return Array(0,"代码有错误：".$retArr[1]."，得0分。");		//$retArr[1]为-3，表示编译通过，但运行超时。
                }
             }
 
