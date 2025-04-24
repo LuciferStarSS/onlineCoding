@@ -249,7 +249,7 @@ function getTasks(value)
          {
             //doTestCleaning();
             var oTASKLIST=document.getElementById("TASKLIST");
-
+            //oTASKLIST.style.visibility="hidden";
             var arrKeys=Object.keys(jsonData);
             for(i=0;i<arrKeys.length;i++)
             {
@@ -323,7 +323,8 @@ function getFile(value,f)
       hideTaskList();
       doTestCleaning();
       editor.setValue("");
-      ext=value;
+      if(f!==1)
+         ext=value;
       if(taskID)
          document.getElementById("INPUT_TKID").value=taskID;
 
