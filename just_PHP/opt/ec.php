@@ -2,40 +2,40 @@
 flush();
 $type=isset($_GET['t'])?$_GET['t']:"c";
 
-$strCODE=isset($_POST['CODE'])?$_POST['CODE']:"";	//´úÂë
-$strINPUT=isset($_POST['DATA'])?$_POST['DATA']:"";	//ÊäÈë
-$strARGS=isset($_POST['ARGS'])?$_POST['ARGS']:"";	//²ÎÊı
-$strCN=isset($_POST['CN'])?$_POST['CN']:"";		//°à¼¶
-$taskID=isset($_POST["TKID"])?$_POST["TKID"]:"";		//ÏîÄ¿Ãû³Æ
+$strCODE=isset($_POST['CODE'])?$_POST['CODE']:"";	//ä»£ç 
+$strINPUT=isset($_POST['DATA'])?$_POST['DATA']:"";	//è¾“å…¥
+$strARGS=isset($_POST['ARGS'])?$_POST['ARGS']:"";	//å‚æ•°
+$strCN=isset($_POST['CN'])?$_POST['CN']:"";		//ç­çº§
+$taskID=isset($_POST["TKID"])?$_POST["TKID"]:"";		//é¡¹ç›®åç§°
 
-$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:exit("ÇëÏÈµÇÂ¼¡£");	//ÓÃ»§Ãû
+$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:exit("è¯·å…ˆç™»å½•ã€‚");	//ç”¨æˆ·å
 
-//$username="ÎâÀÏÊ¦";
+//$username="å´è€å¸ˆ";
 
 //$username=iconv("GBK","UTF-8",$username);
-define("TIMEOUT", 3);					//³¬Ê±¿ØÖÆ£¬3Ãë
+define("TIMEOUT", 3);					//è¶…æ—¶æ§åˆ¶ï¼Œ3ç§’
 
 function kill($pid) {
     return stripos(php_uname('s'), 'win') > -1 ? exec("taskkill /F /T /PID $pid") : exec("kill -9 $pid");
 }
 
-//Ê¹ÓÃ proc_open() ´´½¨¹ÜµÀ²¢Ö´ĞĞÃüÁî
-//ÒªÖ´ĞĞµÄÃüÁîÈç¹ûÓĞ²ÎÊı£¬Ö»ĞèÒªÆ´½ÓÔÚ$commandºóÃæ¾Í¿ÉÒÔÁË
-//$CHECK_TIMEOUTÓÃÓÚ¿ØÖÆ³ÌĞòµÄÖ´ĞĞÊ±³¤£¬´úÂëÖĞ¿ÉÄÜ´æÔÚÎŞÏŞÑ­»·£¨Infinite Loops£©£¬ÕâÀà´úÂë»áÏûºÄ´óÁ¿µÄCPU£¬ËùÒÔĞèÒª¼°Ê±µØÖÕÖ¹¡£
+//ä½¿ç”¨ proc_open() åˆ›å»ºç®¡é“å¹¶æ‰§è¡Œå‘½ä»¤
+//è¦æ‰§è¡Œçš„å‘½ä»¤å¦‚æœæœ‰å‚æ•°ï¼Œåªéœ€è¦æ‹¼æ¥åœ¨$commandåé¢å°±å¯ä»¥äº†
+//$CHECK_TIMEOUTç”¨äºæ§åˆ¶ç¨‹åºçš„æ‰§è¡Œæ—¶é•¿ï¼Œä»£ç ä¸­å¯èƒ½å­˜åœ¨æ— é™å¾ªç¯ï¼ˆInfinite Loopsï¼‰ï¼Œè¿™ç±»ä»£ç ä¼šæ¶ˆè€—å¤§é‡çš„CPUï¼Œæ‰€ä»¥éœ€è¦åŠæ—¶åœ°ç»ˆæ­¢ã€‚
 function runCMD($command, $stdInput="",$CHECK_TIMEOUT=false){
    $process = proc_open($command, [
-      0 => ['pipe', 'r'],  				// ±ê×¼ÊäÈë£¬×Ó½ø³Ì´Ó´Ë¹ÜµÀÖĞ¶ÁÈ¡Êı¾İ
-      1 => ['pipe', 'w'],  				// ±ê×¼Êä³ö£¬×Ó½ø³ÌÏò´Ë¹ÜµÀÖĞĞ´ÈëÊı¾İ
-      2 => ['pipe', 'w']   				// ±ê×¼´íÎó£¬×Ó½ø³ÌÏò´Ë¹ÜµÀÖĞĞ´Èë´íÎóĞÅÏ¢
+      0 => ['pipe', 'r'],  				// æ ‡å‡†è¾“å…¥ï¼Œå­è¿›ç¨‹ä»æ­¤ç®¡é“ä¸­è¯»å–æ•°æ®
+      1 => ['pipe', 'w'],  				// æ ‡å‡†è¾“å‡ºï¼Œå­è¿›ç¨‹å‘æ­¤ç®¡é“ä¸­å†™å…¥æ•°æ®
+      2 => ['pipe', 'w']   				// æ ‡å‡†é”™è¯¯ï¼Œå­è¿›ç¨‹å‘æ­¤ç®¡é“ä¸­å†™å…¥é”™è¯¯ä¿¡æ¯
    ],$pipes);
 
-   // ´Ó±ê×¼ÊäÈëÖĞ¶ÁÈ¡Êı¾İ²¢Ğ´Èëµ½±ê×¼Êä³ö
+   // ä»æ ‡å‡†è¾“å…¥ä¸­è¯»å–æ•°æ®å¹¶å†™å…¥åˆ°æ ‡å‡†è¾“å‡º
    if (is_resource($process)) {
-      stream_set_blocking($pipes[1], 0); 		// ÉèÖÃ stdout Îª·Ç×èÈûÄ£Ê½£¬ÒÔ±ãÎÒÃÇ¿ÉÒÔ¼ì²éÊı¾İÊÇ·ñ¿É¶Á
-      stream_set_blocking($pipes[2], 0); 		// ÉèÖÃ stdout Îª·Ç×èÈûÄ£Ê½£¬ÒÔ±ãÎÒÃÇ¿ÉÒÔ¼ì²éÊı¾İÊÇ·ñ¿É¶Á
+      stream_set_blocking($pipes[1], 0); 		// è®¾ç½® stdout ä¸ºéé˜»å¡æ¨¡å¼ï¼Œä»¥ä¾¿æˆ‘ä»¬å¯ä»¥æ£€æŸ¥æ•°æ®æ˜¯å¦å¯è¯»
+      stream_set_blocking($pipes[2], 0); 		// è®¾ç½® stdout ä¸ºéé˜»å¡æ¨¡å¼ï¼Œä»¥ä¾¿æˆ‘ä»¬å¯ä»¥æ£€æŸ¥æ•°æ®æ˜¯å¦å¯è¯»
 
-      if($stdInput) fwrite($pipes[0],$stdInput);		//ÓÃ»§ÊäÈë
-      fclose($pipes[0]); 				//²»ĞèÒªÔÙÏò×Ó½ø³Ì´«µİÈÎºÎÊäÈëÁË£¬ËùÒÔ¹Ø±Õ´Ë¹ÜµÀ
+      if($stdInput) fwrite($pipes[0],$stdInput);		//ç”¨æˆ·è¾“å…¥
+      fclose($pipes[0]); 				//ä¸éœ€è¦å†å‘å­è¿›ç¨‹ä¼ é€’ä»»ä½•è¾“å…¥äº†ï¼Œæ‰€ä»¥å…³é—­æ­¤ç®¡é“
 
       $output="";
       $error_output = "";
@@ -49,8 +49,8 @@ function runCMD($command, $stdInput="",$CHECK_TIMEOUT=false){
             if(!$status['running']) break;
             if(time()-$startTime > TIMEOUT){
                $bTimeOut = true;
-               //proc_terminate($pipes[1], 9);	//LINUX/UNIXÏÂÊÊÓÃ£º·¢ËÍ SIGKILL ĞÅºÅÖÕÖ¹½ø³Ì
-               kill($status['pid']);		//WindowsÏÂÊ¹ÓÃtaskkillÀ´É±½ø³Ì
+               //proc_terminate($pipes[1], 9);	//LINUX/UNIXä¸‹é€‚ç”¨ï¼šå‘é€ SIGKILL ä¿¡å·ç»ˆæ­¢è¿›ç¨‹
+               kill($status['pid']);		//Windowsä¸‹ä½¿ç”¨taskkillæ¥æ€è¿›ç¨‹
                break;
             }
             usleep(10000);
@@ -60,40 +60,39 @@ function runCMD($command, $stdInput="",$CHECK_TIMEOUT=false){
       fclose($pipes[1]);
       $error_output = stream_get_contents($pipes[2]);
       fclose($pipes[2]);
-      proc_close($process);      			//¹Ø±Õ¹ÜµÀ×ÊÔ´
-      if($bTimeOut)				//Èç¹û³¬Ê±
-         return Array(0=>-3,"³ÌĞòÔËĞĞÒÑ³¬¹ı ".TIMEOUT." Ãë£¬±»Ç¿ĞĞÖÕÖ¹");
-      if (!empty($error_output))      		//´òÓ¡´íÎóÊä³ö£¨Èç¹ûÓĞ£©
+      proc_close($process);      			//å…³é—­ç®¡é“èµ„æº
+      if($bTimeOut)				//å¦‚æœè¶…æ—¶
+         return Array(0=>-3,"ç¨‹åºè¿è¡Œå·²è¶…è¿‡ ".TIMEOUT." ç§’ï¼Œè¢«å¼ºè¡Œç»ˆæ­¢");
+      if (!empty($error_output))      		//æ‰“å°é”™è¯¯è¾“å‡ºï¼ˆå¦‚æœæœ‰ï¼‰
          return Array(0=>-2,$error_output);
       else
          return Array(0=>0,"resrun"=>$output,"rescomp"=>$error_output);
    }
    else {
-      return Array(0=>-1,"Æô¶¯±àÒëÆ÷Ê§°Ü¡£");
+      return Array(0=>-1,"å¯åŠ¨ç¼–è¯‘å™¨å¤±è´¥ã€‚");
    }
 }
 
-//±àÒëºÍÔËĞĞC´úÂë
+//ç¼–è¯‘å’Œè¿è¡ŒCä»£ç 
 function runCCode($filename,$code,$input,$args) {
    $code=iconv("UTF-8","GBK",$code);
    //saveCode($filename,$code);
-   $strCMD="gcc ".$filename." -Wall -o ".$filename.".exe";	//pythonµÄsubprocess¿ÉÒÔÖ´ĞĞ.out£¬PHPµÄ²»ĞĞ¡£
+   $strCMD="gcc ".$filename." -Wall -o ".$filename.".exe";	//pythonçš„subprocesså¯ä»¥æ‰§è¡Œ.outï¼ŒPHPçš„ä¸è¡Œã€‚
    $retArray=runCMD($strCMD,"",true);
-var_dump($retArray);
    if($retArray[0]==0)
-       $retArray=runCMD($filename.".exe".($args?" ".$args:""),$input,true);	//Ö´ĞĞµÄÊ±ºò£¬
-   else return Array(-99,"³¬Ê±");
-   									//    Èç¹ûÓĞ²ÎÊı£¬¾Í¸½¼Óµ½´ıÖ´ĞĞ³ÌĞòºó£»
-   return $retArray;							//    Èç¹ûÓĞÊäÈë£¬¾Í×÷ÎªµÚ¶ş¸ö²ÎÊı´«µİ¡£
+       $retArray=runCMD($filename.".exe".($args?" ".$args:""),$input,true);	//æ‰§è¡Œçš„æ—¶å€™ï¼Œ
+   else return Array(-99,"è¶…æ—¶");
+   									//    å¦‚æœæœ‰å‚æ•°ï¼Œå°±é™„åŠ åˆ°å¾…æ‰§è¡Œç¨‹åºåï¼›
+   return $retArray;							//    å¦‚æœæœ‰è¾“å…¥ï¼Œå°±ä½œä¸ºç¬¬äºŒä¸ªå‚æ•°ä¼ é€’ã€‚
 }
 
-//±àÒëºÍÔËĞĞC++´úÂë
+//ç¼–è¯‘å’Œè¿è¡ŒC++ä»£ç 
 function runCPPCode($filename,$code,$input,$args,$compile) {
-   if($compile==1)//µÚÒ»´ÎÒª±àÒëÒ»ÏÂ£¬ºóÃæ¾Í²»ĞèÒªÁË¡£
+   if($compile==1)//ç¬¬ä¸€æ¬¡è¦ç¼–è¯‘ä¸€ä¸‹ï¼Œåé¢å°±ä¸éœ€è¦äº†ã€‚
    {
       $code=iconv("UTF-8","GBK",$code);
       saveCode($filename,$code);
-      $strCMD="g++ ".$filename." -Wall -o ".$filename.".exe";	//pythonµÄsubprocess¿ÉÒÔÖ´ĞĞ.out£¬PHPµÄ²»ĞĞ¡£
+      $strCMD="g++ ".$filename." -Wall -o ".$filename.".exe";	//pythonçš„subprocesså¯ä»¥æ‰§è¡Œ.outï¼ŒPHPçš„ä¸è¡Œã€‚
       $retArray=runCMD($strCMD,"",true);
       if($retArray[0]==0)
          $retArray=runCMD($filename.".exe".($args?" ".$args:""),$input,true);
@@ -104,7 +103,7 @@ function runCPPCode($filename,$code,$input,$args,$compile) {
    return $retArray;
 }
 
-//ÔËĞĞPython´úÂë
+//è¿è¡ŒPythonä»£ç 
 function runPythonCode($filename,$code,$input,$args){
    //saveCode($filename,$code);
    $strCMD="python.exe ".$filename.($args?" ".$args:"");	
@@ -112,7 +111,7 @@ function runPythonCode($filename,$code,$input,$args){
    return $retArray;
 }
 
-//±£´æ´úÂë
+//ä¿å­˜ä»£ç 
 function saveCode($filename,$code){
    file_put_contents($filename,$code);
 }
@@ -126,21 +125,21 @@ function convertMixedToUtf8($str) {
     while ($i <= $len) {
         $byte1 = $bytes[$i];
         
-        // ´¦ÀíASCII×Ö·û
+        // å¤„ç†ASCIIå­—ç¬¦
         if ($byte1 <= 0x7F) {
             $result .= chr($byte1);
             $i++;
             continue;
         }
         
-        // ¼ì²âUTF-8¶à×Ö½Ú×Ö·û
+        // æ£€æµ‹UTF-8å¤šå­—èŠ‚å­—ç¬¦
         $utf8Processed = false;
         $charLength = 0;
-        if (($byte1 & 0xE0) == 0xC0) { // 2×Ö½Ú
+        if (($byte1 & 0xE0) == 0xC0) { // 2å­—èŠ‚
             $charLength = 2;
-        } elseif (($byte1 & 0xF0) == 0xE0) { // 3×Ö½Ú
+        } elseif (($byte1 & 0xF0) == 0xE0) { // 3å­—èŠ‚
             $charLength = 3;
-        } elseif (($byte1 & 0xF8) == 0xF0) { // 4×Ö½Ú
+        } elseif (($byte1 & 0xF8) == 0xF0) { // 4å­—èŠ‚
             $charLength = 4;
         }
         
@@ -169,7 +168,7 @@ function convertMixedToUtf8($str) {
             continue;
         }
         
-        // ´¦ÀíGBK×Ö·û
+        // å¤„ç†GBKå­—ç¬¦
         if ($byte1 >= 0x81 && $byte1 <= 0xFE && $i + 1 <= $len) {
             $byte2 = $bytes[$i + 1];
             if ($byte2 >= 0x40 && $byte2 <= 0xFE && $byte2 != 0x7F) {
@@ -183,7 +182,7 @@ function convertMixedToUtf8($str) {
             }
         }
         
-        // ÎŞ·¨Ê¶±ğµÄ×Ö·û£¬Ìæ»»Îª?
+        // æ— æ³•è¯†åˆ«çš„å­—ç¬¦ï¼Œæ›¿æ¢ä¸º?
         $result .= '?';
         $i++;
     }
@@ -191,7 +190,57 @@ function convertMixedToUtf8($str) {
     return $result;
 }
 
-function evaluateCode($TKID,$filename,$strCODE,$strARGS)
+
+function evaluateCCode($TKID,$filename,$strCODE,$strARGS)
+{
+   $scoreStr="";
+   $score=0;
+   $evaluateCounter=0;
+   $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$TKID.DIRECTORY_SEPARATOR."checking".DIRECTORY_SEPARATOR;
+
+   if ($handle = opendir($add))
+   {
+      while (false !== ($file = readdir($handle)))
+      {
+         if ($file!="." && $file!=".." && is_dir($add.$file))
+         {
+            $evaluateCounter++;
+            $strINPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."input.txt");
+            $strOUTPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."output.txt");
+            $retArr=runCCode($filename,$strCODE,$strINPUT,$strARGS,$evaluateCounter);
+
+            if($evaluateCounter==1)//ç¬¬ä¸€è½®ï¼Œç¼–è¯‘é€šè¿‡åˆ†
+            {
+               if($retArr[0]==0) {							//ç¼–è¯‘æˆåŠŸï¼Œå¾—10åˆ†ï¼Œä½†è¦æ”¾åœ¨æœ€ååŠ ã€‚
+                  $scoreStr.="ä»£ç ç¼–è¯‘è¿è¡ŒæˆåŠŸï¼Œå¾—10åˆ†ã€‚\r\n";
+               }
+               else{
+                  $scoreStr.="ä»£ç ç¼–è¯‘å¤±è´¥ï¼Œä¸å¾—åˆ†ã€‚\r\n";
+                  return Array(0,"ç¼–è¯‘ä¸é€šè¿‡ï¼š".$retArr[1]."ï¼Œå¾—0åˆ†ã€‚");		//$retArr[1]ä¸º-3ï¼Œè¡¨ç¤ºç¼–è¯‘é€šè¿‡ï¼Œä½†è¿è¡Œè¶…æ—¶ã€‚
+               }
+            }
+
+            $scoreStr.="æ ·ä¾‹è¯„ä¼°ç¬¬ ".$evaluateCounter." è½®ï¼š\r\n";
+
+            if($retArr[0]==0 && $retArr["resrun"]==$strOUTPUT)  
+            {
+               $score+=90;
+               $scoreStr.="ç¨‹åºè¿è¡Œæ ·ä¾‹â€œ".$file."â€ç»“æœæ­£ç¡®ï¼Œå¾—90åˆ†ã€‚\r\n";		//è¿è¡Œç»“æœä¸é¢„æœŸå€¼ä¸€è‡´ï¼Œå¾—90åˆ†ã€‚
+            }
+            else $scoreStr.="ç¨‹åºè¿è¡Œæ ·ä¾‹â€œ".$file."â€ç»“æœä¸æ­£ç¡®ï¼Œä¸å¾—åˆ†ã€‚\r\n";	//è¿è¡Œç»“æœä¸é¢„æœŸå€¼ä¸ä¸€è‡´ï¼Œå¾—0åˆ†ã€‚
+         }
+      }
+      closedir($handle); 
+      if($evaluateCounter==0) $score=0;
+      else $score/=$evaluateCounter;								//å¤šè½®æ ·ä¾‹å¾—åˆ†å–å¹³å‡å€¼
+      $score+=10;									//ç¼–è¯‘é€šè¿‡ï¼Œå¾—10åˆ†ã€‚
+      $scoreStr.="æœ¬é¢˜ç»¼åˆå¾—åˆ†ï¼š".$score;
+   }
+   return Array($score/$evaluateCounter,$scoreStr);
+}
+
+
+function evaluateCPPCode($TKID,$filename,$strCODE,$strARGS)
 {
    $scoreStr="";
    $score=0;
@@ -209,34 +258,89 @@ function evaluateCode($TKID,$filename,$strCODE,$strARGS)
             $strOUTPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."output.txt");
             $retArr=runCPPCode($filename,$strCODE,$strINPUT,$strARGS,$evaluateCounter);
 
-            if($evaluateCounter==1)//µÚÒ»ÂÖ£¬±àÒëÍ¨¹ı·Ö
+            if($evaluateCounter==1)//ç¬¬ä¸€è½®ï¼Œç¼–è¯‘é€šè¿‡åˆ†
             {
-               if($retArr[0]==0) {							//±àÒë³É¹¦£¬µÃ10·Ö£¬µ«Òª·ÅÔÚ×îºó¼Ó¡£
-                  $scoreStr.="´úÂë±àÒëÔËĞĞ³É¹¦£¬µÃ10·Ö¡£\r\n";
+               if($retArr[0]==0) {							//ç¼–è¯‘æˆåŠŸï¼Œå¾—10åˆ†ï¼Œä½†è¦æ”¾åœ¨æœ€ååŠ ã€‚
+                  $scoreStr.="ä»£ç ç¼–è¯‘è¿è¡ŒæˆåŠŸï¼Œå¾—10åˆ†ã€‚\r\n";
                }
                else{
-                  $scoreStr.="´úÂë±àÒëÊ§°Ü£¬²»µÃ·Ö¡£\r\n";
-                  return Array(0,"±àÒë²»Í¨¹ı£º".$retArr[1]."£¬µÃ0·Ö¡£");		//$retArr[1]Îª-3£¬±íÊ¾±àÒëÍ¨¹ı£¬µ«ÔËĞĞ³¬Ê±¡£
+                  $scoreStr.="ä»£ç ç¼–è¯‘å¤±è´¥ï¼Œä¸å¾—åˆ†ã€‚\r\n";
+                  return Array(0,"ç¼–è¯‘ä¸é€šè¿‡ï¼š".$retArr[1]."ï¼Œå¾—0åˆ†ã€‚");		//$retArr[1]ä¸º-3ï¼Œè¡¨ç¤ºç¼–è¯‘é€šè¿‡ï¼Œä½†è¿è¡Œè¶…æ—¶ã€‚
                }
             }
 
-            $scoreStr.="ÑùÀıÆÀ¹ÀµÚ ".$evaluateCounter." ÂÖ£º\r\n";
+            $scoreStr.="æ ·ä¾‹è¯„ä¼°ç¬¬ ".$evaluateCounter." è½®ï¼š\r\n";
 
             if($retArr[0]==0 && $retArr["resrun"]==$strOUTPUT)  
             {
                $score+=90;
-               $scoreStr.="³ÌĞòÔËĞĞÑùÀı¡°".$file."¡±½á¹ûÕıÈ·£¬µÃ90·Ö¡£\r\n";		//ÔËĞĞ½á¹ûÓëÔ¤ÆÚÖµÒ»ÖÂ£¬µÃ90·Ö¡£
+               $scoreStr.="ç¨‹åºè¿è¡Œæ ·ä¾‹â€œ".$file."â€ç»“æœæ­£ç¡®ï¼Œå¾—90åˆ†ã€‚\r\n";		//è¿è¡Œç»“æœä¸é¢„æœŸå€¼ä¸€è‡´ï¼Œå¾—90åˆ†ã€‚
             }
-            else $scoreStr.="³ÌĞòÔËĞĞÑùÀı¡°".$file."¡±½á¹û²»ÕıÈ·£¬²»µÃ·Ö¡£\r\n";	//ÔËĞĞ½á¹ûÓëÔ¤ÆÚÖµ²»Ò»ÖÂ£¬µÃ0·Ö¡£
+            else $scoreStr.="ç¨‹åºè¿è¡Œæ ·ä¾‹â€œ".$file."â€ç»“æœä¸æ­£ç¡®ï¼Œä¸å¾—åˆ†ã€‚\r\n";	//è¿è¡Œç»“æœä¸é¢„æœŸå€¼ä¸ä¸€è‡´ï¼Œå¾—0åˆ†ã€‚
          }
       }
-      closedir($handle); 
-      $score/=$evaluateCounter;								//¶àÂÖÑùÀıµÃ·ÖÈ¡Æ½¾ùÖµ
-      $score+=10;									//±àÒëÍ¨¹ı£¬µÃ10·Ö¡£
-      $scoreStr.="±¾Ìâ×ÛºÏµÃ·Ö£º".$score;
+      closedir($handle);  
+      if($evaluateCounter==0) $score=0;
+      else 
+         $score/=$evaluateCounter;								//å¤šè½®æ ·ä¾‹å¾—åˆ†å–å¹³å‡å€¼
+      $score+=10;									//ç¼–è¯‘é€šè¿‡ï¼Œå¾—10åˆ†ã€‚
+      $scoreStr.="æœ¬é¢˜ç»¼åˆå¾—åˆ†ï¼š".$score;
    }
    return Array($score/$evaluateCounter,$scoreStr);
 }
+
+
+
+function evaluatePYCode($TKID,$filename,$strCODE,$strARGS)
+{
+   $scoreStr="";
+   $score=0;
+   $evaluateCounter=0;
+   $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$TKID.DIRECTORY_SEPARATOR."checking".DIRECTORY_SEPARATOR;
+
+   if ($handle = opendir($add))
+   {
+      while (false !== ($file = readdir($handle)))
+      {
+         if ($file!="." && $file!=".." && is_dir($add.$file))
+         {
+            $evaluateCounter++;
+            $strINPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."input.txt");
+            $strOUTPUT= file_get_contents($add.$file.DIRECTORY_SEPARATOR."output.txt");
+            $retArr=runPythonCode($filename,$strCODE,$strINPUT,$strARGS,$evaluateCounter);
+
+            if($evaluateCounter==1)//ç¬¬ä¸€è½®ï¼Œç¼–è¯‘é€šè¿‡åˆ†
+            {
+               if($retArr[0]==0) {							//ç¼–è¯‘æˆåŠŸï¼Œå¾—10åˆ†ï¼Œä½†è¦æ”¾åœ¨æœ€ååŠ ã€‚
+                  $scoreStr.="ä»£ç ç¼–è¯‘è¿è¡ŒæˆåŠŸï¼Œå¾—10åˆ†ã€‚\r\n";
+               }
+               else{
+                  $scoreStr.="ä»£ç ç¼–è¯‘å¤±è´¥ï¼Œä¸å¾—åˆ†ã€‚\r\n";
+                  return Array(0,"ç¼–è¯‘ä¸é€šè¿‡ï¼š".$retArr[1]."ï¼Œå¾—0åˆ†ã€‚");		//$retArr[1]ä¸º-3ï¼Œè¡¨ç¤ºç¼–è¯‘é€šè¿‡ï¼Œä½†è¿è¡Œè¶…æ—¶ã€‚
+               }
+            }
+
+            $scoreStr.="æ ·ä¾‹è¯„ä¼°ç¬¬ ".$evaluateCounter." è½®ï¼š\r\n";
+
+            if($retArr[0]==0 && $retArr["resrun"]==$strOUTPUT)  
+            {
+               $score+=90;
+               $scoreStr.="ç¨‹åºè¿è¡Œæ ·ä¾‹â€œ".$file."â€ç»“æœæ­£ç¡®ï¼Œå¾—90åˆ†ã€‚\r\n";		//è¿è¡Œç»“æœä¸é¢„æœŸå€¼ä¸€è‡´ï¼Œå¾—90åˆ†ã€‚
+            }
+            else $scoreStr.="ç¨‹åºè¿è¡Œæ ·ä¾‹â€œ".$file."â€ç»“æœä¸æ­£ç¡®ï¼Œä¸å¾—åˆ†ã€‚\r\n";	//è¿è¡Œç»“æœä¸é¢„æœŸå€¼ä¸ä¸€è‡´ï¼Œå¾—0åˆ†ã€‚
+         }
+      }
+      closedir($handle); 
+      if($evaluateCounter==0) $score=0;
+      else $score/=$evaluateCounter;								//å¤šè½®æ ·ä¾‹å¾—åˆ†å–å¹³å‡å€¼
+      $score+=10;									//ç¼–è¯‘é€šè¿‡ï¼Œå¾—10åˆ†ã€‚
+      $scoreStr.="æœ¬é¢˜ç»¼åˆå¾—åˆ†ï¼š".$score;
+   }
+   return Array($score/$evaluateCounter,$scoreStr);
+}
+
+
+
 
 include "../include/config.inc.php";
 
@@ -248,21 +352,20 @@ if($strCODE && $taskID){
    {
       case "c":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".c";
-         $retArr=runCCode($filename,$strCODE,$strINPUT,$strARGS);
+         $retArr=evaluateCCode($taskID,$filename,$strCODE,$strINPUT,$strARGS);
       break;
 
       case "cpp":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".cpp";
 
-         $retArr=evaluateCode($taskID,$filename,$strCODE,$strINPUT,$strARGS);
+         $retArr=evaluateCPPCode($taskID,$filename,$strCODE,$strINPUT,$strARGS);
       break;
 
       case "py":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".py";
-         $retArr=runPythonCode($filename,$strCODE,$strINPUT,$strARGS);
+         $retArr=evaluatePYCode($taskID,$filename,$strCODE,$strINPUT,$strARGS);
       break;
    }
    echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr[1]);
-
 }
 ?>
