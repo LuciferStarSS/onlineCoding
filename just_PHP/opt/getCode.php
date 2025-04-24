@@ -4,15 +4,14 @@ header("Pragma:no-cache");
 header("Cache-Control:no-cache,must-revalidate");
 include("../include/config.inc.php");
 
-$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:exit(iconv("GBK","UTF-8","ÇëµÇÂ¼"));
+$username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:exit(iconv("GBK","UTF-8","è¯·ç™»å½•"));
 $strUN=isset($_POST['UN'])?$_POST['UN']:"";
 $strCN=isset($_POST['CN'])?$_POST['CN']:"";
 $language=isset($_POST['L'])?$_POST['L']:"";
 $taskID=isset($_POST['TKID'])?intval($_POST['TKID']):"";
 $strFN=isset($_POST['FN'])?$_POST['FN']:"";
 
-if($strUN !=$username) exit(iconv("GBK","UTF-8","ÇëµÇÂ¼"));
-
+if($strUN !=$username) exit(iconv("GBK","UTF-8","è¯·ç™»å½•"));
 
 include("../../include/config.inc.php");
 
@@ -22,7 +21,7 @@ if(isset($scratch_class[$username])) $admin=1;
 
 if($strCN && $strUN && $taskID && $language)
 {
-   if($strFN=="" && $admin)//Êä³öÁĞ±í
+   if($strFN=="" && $admin)//è¾“å‡ºåˆ—è¡¨
    {
       $add="..".DIRECTORY_SEPARATOR.$student_works_dir.$strCN.DIRECTORY_SEPARATOR;
       $list=Array();
@@ -32,7 +31,6 @@ if($strCN && $strUN && $taskID && $language)
          {
             if ($file!="." && $file!=".." && !is_dir($add.$file))
             { 
-
                $f=pathInfo($add.$file);
                if ( $f["extension"]==$language  && strstr($file,"_".$taskID.".") ) //  && ($admin==1 || strstr($file,$username) || strstr($file,"ALL_") || strstr($file,"_EDITABLE_") ))
                   $list[]=$file;
@@ -44,12 +42,12 @@ if($strCN && $strUN && $taskID && $language)
       echo  json_encode($list);
 
    }
-   else{ //Êä³öÎÄ¼ş
-      if($strFN)//½ÌÊ¦»ñÈ¡ÎÄ¼ş
+   else{ //è¾“å‡ºæ–‡ä»¶
+      if($strFN)//æ•™å¸ˆè·å–æ–‡ä»¶
       {
          echo iconv("GBK","UTF-8",file_get_contents("..".DIRECTORY_SEPARATOR.$student_works_dir.$strCN.DIRECTORY_SEPARATOR.$strFN));
       }
-      else//Ñ§Éú»ñÈ¡ÎÄ¼ş
+      else//å­¦ç”Ÿè·å–æ–‡ä»¶
          echo iconv("GBK","UTF-8",file_get_contents("..".DIRECTORY_SEPARATOR.$student_works_dir.$strCN.DIRECTORY_SEPARATOR.$strUN."_".$taskID.".".$language));
    }
 }
