@@ -44,7 +44,7 @@ switch($act)
       {
          while (false !== ($file = readdir($handle)))
          {
-            if ($file!="." && $file!=".." && !is_dir($add.$file))
+            if ($file!="." && $file!=".." && is_dir($add.$file))
             { 
                $list[]=$file;
             }
@@ -59,12 +59,12 @@ switch($act)
       if( $taskID)
       {
          $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$taskID.DIRECTORY_SEPARATOR;
-         echo @file_get_contents($add."task.txt");			//ÈÎÎñÃèÊö
+         echo @file_get_contents($add."task.txt");			//ä»»åŠ¡æè¿°
          echo "<+-NOJSON-+>";
-         echo @file_get_contents($add."demo".DIRECTORY_SEPARATOR."input.txt");		//ÈÎÎñÊäÈëÑùÀı
+         echo @file_get_contents($add."demo".DIRECTORY_SEPARATOR."input.txt");		//ä»»åŠ¡è¾“å…¥æ ·ä¾‹
          echo "<+-NOJSON-+>";
-         echo @file_get_contents($add."demo".DIRECTORY_SEPARATOR."output.txt");		//ÈÎÎñÊä³öÑùÀı
-         if($evaluation==1)						//ÄÚ²¿ÆÀ²âÊı¾İÁĞ±í£¬´ËÊı¾İ½ö¹©³öÌâÊ¹ÓÃ¡£
+         echo @file_get_contents($add."demo".DIRECTORY_SEPARATOR."output.txt");		//ä»»åŠ¡è¾“å‡ºæ ·ä¾‹
+         if($evaluation==1)						//å†…éƒ¨è¯„æµ‹æ•°æ®åˆ—è¡¨ï¼Œæ­¤æ•°æ®ä»…ä¾›å‡ºé¢˜ä½¿ç”¨ã€‚
          {
             $tests="";
             $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$taskID.DIRECTORY_SEPARATOR."checking".DIRECTORY_SEPARATOR;
