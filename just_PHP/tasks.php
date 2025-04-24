@@ -13,7 +13,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=IE10">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8">
-<title>在线编程系统</title>
+<title>在线编程平台（任务管理）</title>
 <link rel="stylesheet" type="text/css" href="./static/devc.css">
 <script>
    var username='<?php echo $username;?>';
