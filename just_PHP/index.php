@@ -1,10 +1,21 @@
-﻿<?php
+<?php
    $type=isset($_GET['t'])?$_GET['t']:"";
    $type=$type==""?"c":$type;
-
+$classid=isset($_COOKIE["CLASSID"])?$_COOKIE["CLASSID"]:"";
 $username=isset($_COOKIE["USERNAME"])?$_COOKIE["USERNAME"]:header("Location: /class/");
 include "../include/config.inc.php";
+
+$strCN="";
+if(isset($classname[$classid]))
+   $strCN=$classname[$classid];
+
 $room=1;
+//$admin=1;
+
+$admin=0;
+
+if(isset($scratch_class[$username])) $admin=1;
+
 
 ?><!DOCTYPE html>
 <html lang=zh-cn>
@@ -12,11 +23,11 @@ $room=1;
 <meta http-equiv="X-UA-Compatible" content="IE=IE10">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8">
-<title>在线编程系统</title>
+<title>在线编程平台</title>
 <link rel="stylesheet" type="text/css" href="./static/devc.css">
 <script>
    var username='<?php echo $username;?>';
-   var classname='';
+   var classname='<?php echo $strCN;?>';
    var ext='';//<?php echo $type;?>';
    var taskID=0;
 </script>
@@ -31,21 +42,26 @@ $room=1;
     </div>
     <div style="float:left;width: 100%;max-width: 1338px; margin-top:0px;margin-bottom:10px;min-width: 650px;">
       <div style="background:darkgray;height: 21px;">
-        <select id=class onchange="getClass(this.value)" title="教师可巡查多个班级，学生只显示自己的班级。" style="
-    position: relative;
-    left: -183px;
-"><option value="">请选择班级</option><?php
-for($i=0;$i<count($class_room[$room]);$i++)
+        <select id=class onchange="getClass(this.value)" title="教师可巡查多个班级，学生只显示自己的班级。" style="position: relative;left: -210px;"><option value="">请选择班级</option>
+<?php
+if($admin)
 {
-   echo "<option value=\"".$classname[$class_room[$room][$i]-1]."\">".$classname[$class_room[$room][$i]-1]."</option>";
+   for($i=0;$i<count($class_room[$room]);$i++)
+   {
+      echo "<option value=\"".$classname[$class_room[$room][$i]-1]."\">".$classname[$class_room[$room][$i]-1]."</option>";
+   }
 }
-        ?></select>
-        <div style="position: relative;top: -20px;width:270px;height: 320px;">
-           <input type=text id=INPUT_TKID style="position: absolute;left:0px;visibility:hidden" onclick="showTaskList()" placeholder="输入编号后敲回车也可打开">
+else
+   echo "<option value=\"".$strCN."\">".$strCN."</option>";
+?>
+          </select>
+        <div style="position: relative;top: -20px;width:270px;height: 320px;left:-28px">
+           <input type=text id=INPUT_TKID style="position: absolute;left:0px;visibility:hidden;width:60px" onclick="showTaskList()" placeholder="任务编号" title="输入数字后敲回车键可直接打开">
            <div id=TASKLIST style="position: absolute;left: 0px;top: 25px;height:200px;visibility:hidden;z-index: 10;overflow: overlay;max-height: 170px;background: chocolate;"></div>
          </div>
         <!--select id=TKID onclick="getTasks(this.value);" style="visibility:hidden" title="不同的年级可以显示不同的试题。"><option value="">请选择练习题</option></select-->
-        <select id=EXT onchange="getFile(this.value);" style="visibility: hidden;position: relative;top: -340px;left: 90px;" title="如果之前提交过某一语言的源码，则可以直接打开。"><option value="">请选择语言</option><option value="c">C</option><option value="cpp">C++</option><option value="py">Python</option></select>
+        <select id=EXT onchange="getFile(this.value,0);" style="visibility: hidden;position: relative;top: -340px;left: 34px;" title="如果之前提交过某一语言的源码，则可以直接打开。"><option value="">请选择语言</option><option value="c">C</option><option value="cpp">C++</option><option value="py">Python</option></select>
+        <select id=SWORKS onchange="getFile(this.value,1);" style="visibility: hidden;position: relative;top: -340px;left: 32px;width:158px" title="如果之前提交过某一语言的源码，则可以直接打开。"><option value="">请选择源码文件</option></select>
       </div>
     </div>
 
@@ -66,7 +82,7 @@ for($i=0;$i<count($class_room[$room]);$i++)
         <!--预设任务分发-->
         <div style="position: relative;top: 200px;">
           <div style="text-align: left;">操作说明：<br>
-            1.依次选择班级、习题和编程语言种类后，如果之前提交过代码，则会自动调取并显示代码；<br>
+            1.依次选择班级、任务和编程语言种类后，如果之前提交过代码，则会自动调取并显示代码；<br>
             2.代码编写完成后，在运行前，可以根据需要设置“执行参数”和“数据输入”；<br>
             3.可以根据“编译结果”排查代码中的错误；<br>
             4.如果代码正确，且程序有结果输出，则会显示在“输出结果”中；<br>
@@ -157,11 +173,21 @@ function showTaskList()
 }
 
 //整理界面
-function doCleaning()
+//界面初始化
+function doTestCleaning()
 {
    document.getElementById("compile").value="";
    document.getElementById("result").value="";
 }
+
+function doTaskCleaning()
+{
+   doTestCleaning();
+   document.getElementById("question").value="";
+   document.getElementById("demoinput").value="";
+   document.getElementById("demooutput").value="";
+}
+
 
 
 //保存、编译和运行源代码
@@ -179,7 +205,7 @@ function checkCode()
    }
    else
    {
-      doCleaning();
+      doTestCleaning();
    
       $.post("./opt/cc.php?t="+ext, {"UN":username,"CN":classname,"TKID":taskID, "CODE": strCode,"DATA":data, "ARGS":args}, function (data) {
          var dataArr=data.split("<+-NOJSON-+>");
@@ -200,7 +226,7 @@ function evaluateCode()
 
    if(editor.getValue()=="") alert("未输入代码，无需保存。");
 
-   doCleaning();
+   doTestCleaning();
    
    $.post("./opt/ec.php?t="+ext, {"UN":username,"CN":classname,"TKID":taskID, "CODE": editor.getValue(),"DATA":data, "ARGS":args}, function (data) {
       var dataArr=data.split("<+-NOJSON-+>");
@@ -221,7 +247,7 @@ function getTasks(value)
          var jsonData=JSON.parse(data);
          if(jsonData)
          {
-            //doCleaning();
+            //doTestCleaning();
             var oTASKLIST=document.getElementById("TASKLIST");
 
             var arrKeys=Object.keys(jsonData);
@@ -260,12 +286,16 @@ function getTask(value)
          var dataArr=data.split("<+-NOJSON-+>");
          if(dataArr.length==3)
          {
-            doCleaning();
+            doTestCleaning();
             document.getElementById("question").value=dataArr[0];
             document.getElementById("demoinput").value=dataArr[1];
             document.getElementById("demooutput").value=dataArr[2];
          }
-         else alert(data);
+         else
+         {
+            doTaskCleaning();
+            alert(data);
+         }
       });
    }
 }
@@ -287,17 +317,53 @@ function getClass(value)
 
 //获取提交过的源代码数据
 //如果是教师，则应该获取所有人的源代码的列表。
-function getFile(value)
+function getFile(value,f)
 {
    if(value){
       hideTaskList();
-      doCleaning();
+      doTestCleaning();
       editor.setValue("");
       ext=value;
       if(taskID)
          document.getElementById("INPUT_TKID").value=taskID;
-      $.post("./opt/getCode.php?T="+value, {"UN":username, "CN":classname, "TKID":taskID, "L":ext}, function (data) {
-         //var jsonData=JSON.parse(data);
+
+<?php 
+   if($admin)		//教师获取列表
+   {
+?>
+      if(f)
+      {
+         $.post("./opt/getCode.php", {"UN":username, "CN":classname, "TKID":taskID, "L":ext,"FN":value}, function (data) {
+            if(data)
+            {
+               if(data=="请登陆")
+                  alert("登录已超时，请重新登录。");
+               else
+                  editor.setValue(data);
+            }
+         });
+
+      }
+      else
+      {
+            $.post("./opt/getCode.php?T="+value, {"UN":username, "CN":classname, "TKID":taskID, "L":ext}, function (data) {
+            //var jsonData=JSON.parse(data);
+            var oLIST=document.getElementById("SWORKS");
+            oLIST.style.visibility="visible";
+            oLIST.length=0;
+            oLIST.append(new Option("请选择源码文件",""));
+            for(var i=0;i<data.length;i++)
+            {
+               oLIST.append(new Option(data[i],data[i]));
+            }
+         },"json");
+      }
+<?php 
+   }
+   else			//学生获取文件
+   {
+?>
+      $.post("./opt/getCode.php", {"UN":username, "CN":classname, "TKID":taskID, "L":ext}, function (data) {
          if(data)
          {
             if(data=="请登陆")
@@ -306,9 +372,12 @@ function getFile(value)
                editor.setValue(data);
          }
       });
+
+<?php 
+   }
+?>
    }
 }
-
 
 </script>
 </body>
