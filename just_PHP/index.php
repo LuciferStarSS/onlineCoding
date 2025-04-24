@@ -249,7 +249,6 @@ function getTasks(value)
          {
             //doTestCleaning();
             var oTASKLIST=document.getElementById("TASKLIST");
-            //oTASKLIST.style.visibility="hidden";
             var arrKeys=Object.keys(jsonData);
             for(i=0;i<arrKeys.length;i++)
             {
@@ -286,6 +285,7 @@ function getTask(value)
          var dataArr=data.split("<+-NOJSON-+>");
          if(dataArr.length==3)
          {
+            document.getElementById("TASKLIST").style.visibility="hidden";
             doTestCleaning();
             document.getElementById("question").value=dataArr[0];
             document.getElementById("demoinput").value=dataArr[1];
