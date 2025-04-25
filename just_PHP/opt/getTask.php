@@ -26,7 +26,7 @@ switch($act)
         }
          closedir($handle); 
       }
-      rsort($list);
+      sort($list);
       echo  json_encode($list);
 
    break;
@@ -40,13 +40,13 @@ switch($act)
          $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$taskID.DIRECTORY_SEPARATOR;
          if(file_exists($add))
          {
-         echo file_get_contents($add."task.txt");			//ÈÎÎñÃèÊö
+         echo file_get_contents($add."task.txt");			//ä»»åŠ¡æè¿°
          echo "<+-NOJSON-+>";
-         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."input.txt");		//ÈÎÎñÊäÈëÑùÀı
+         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."input.txt");		//ä»»åŠ¡è¾“å…¥æ ·ä¾‹
          echo "<+-NOJSON-+>";
-         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."output.txt");		//ÈÎÎñÊä³öÑùÀı
+         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."output.txt");		//ä»»åŠ¡è¾“å‡ºæ ·ä¾‹
          }
-         else echo iconv("GBK","UTF-8","ÎŞ´ËÊÔÌâ¡£");
+         else echo iconv("GBK","UTF-8","æ— æ­¤è¯•é¢˜ã€‚");
       }
    break;
 }
