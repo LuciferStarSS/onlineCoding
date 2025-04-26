@@ -340,7 +340,8 @@ function getFile(value,f)
                if(data=="请登陆")
                   alert("登录已超时，请重新登录。");
                else
-                  editor.setValue(data);
+                  //editor.setValue(data);
+                  typeWriter(data, "textElement", 100);
             }
          });
 
@@ -370,7 +371,8 @@ function getFile(value,f)
             if(data=="请登陆")
                alert("登录已超时，请重新登录。");
             else
-               editor.setValue(data);
+               //editor.setValue(data);
+               typeWriter(data, "textElement", 100);
          }
       });
 
@@ -379,6 +381,26 @@ function getFile(value,f)
 ?>
    }
 }
+
+
+function typeWriter(text, elementId, interval) {
+    let i = 0;
+    const element = document.createElement("div");
+    const writeText = () => {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            editor.setValue(element.textContent);
+            i++;
+            requestAnimationFrame(writeText); // 使用requestAnimationFrame递归调用
+        }
+    };
+    writeText();
+}
+ 
+// 使用示例
+ // 每隔大约16.67毫秒（浏览器帧率通常为60Hz）显示下一个字符，但这里我们忽略了间隔的概念，因为requestAnimationFrame本身就是为了平滑动画设计的。
+
+
 
 </script>
 </body>
