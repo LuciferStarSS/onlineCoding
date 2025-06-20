@@ -40,13 +40,13 @@ switch($act)
          $add="..".DIRECTORY_SEPARATOR."tasks".DIRECTORY_SEPARATOR.$taskID.DIRECTORY_SEPARATOR;
          if(file_exists($add))
          {
-         echo file_get_contents($add."task.txt");			//ä»»åŠ¡æè¿°
+         echo file_get_contents($add."task.txt");			//ÈÎÎñÃèÊö
          echo "<+-NOJSON-+>";
-         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."input.txt");		//ä»»åŠ¡è¾“å…¥æ ·ä¾‹
+         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."input.txt");		//ÈÎÎñÊäÈëÑùÀı
          echo "<+-NOJSON-+>";
-         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."output.txt");		//ä»»åŠ¡è¾“å‡ºæ ·ä¾‹
+         echo file_get_contents($add."demo".DIRECTORY_SEPARATOR."output.txt");		//ÈÎÎñÊä³öÑùÀı
          }
-         else echo iconv("GBK","UTF-8","æ— æ­¤è¯•é¢˜ã€‚");
+         else echo iconv("GBK","UTF-8","ÎŞ´ËÊÔÌâ¡£");
       }
    break;
 }

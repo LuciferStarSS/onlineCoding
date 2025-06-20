@@ -1,6 +1,5 @@
 <?php
-//CheckCode代码保存和检查
-flush();
+//SaveCode自动备份
 $type=isset($_GET['t'])?$_GET['t']:"c";
 
 $strCODE=isset($_POST['CODE'])?$_POST['CODE']:"";	//代码
@@ -106,33 +105,6 @@ function runPythonCode($filename,$code,$input,$args){
    return $retArray;
 }
 
-
-
-//运行PHP代码
-function runPHPCode($filename,$code,$input,$args){
-   saveCode($filename,$code);
-   $strCMD="php.exe ".$filename.($args?" ".$args:"");	
-   $retArray=runCMD($strCMD,$input,true);
-   return $retArray;
-}
-
-
-//运行JAVA代码
-function runJAVACode($filename,$code,$input,$args){
-   saveCode($filename,$code);
-   $strCMD="java.exe ".$filename.($args?" ".$args:"");	
-   $retArray=runCMD($strCMD,$input,true);
-   return $retArray;
-}
-
-//运行JAVA代码
-function runVBSCode($filename,$code,$input,$args){
-   saveCode($filename,$code);
-   $strCMD="wscript.exe ".$filename.($args?" ".$args:"");	
-   $retArray=runCMD($strCMD,$input,true);
-   return $retArray;
-}
-
 //保存代码
 function saveCode($filename,$code){
    file_put_contents($filename,$code);
@@ -226,39 +198,19 @@ if($strCODE && $taskID){
       case "c":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".c";
          $retArr=runCCode($filename,$strCODE,$strINPUT,$strARGS);
-         echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['resrun'])."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);
       break;
 
       case "cpp":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".cpp";
          $retArr=runCPPCode($filename,$strCODE,$strINPUT,$strARGS);
-         echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['resrun'])."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);
       break;
 
       case "py":
          $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".py";
          $retArr=runPythonCode($filename,$strCODE,$strINPUT,$strARGS);
-         echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['resrun'])."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);
-      break;
-
-      case "php":
-         $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".php";
-         $retArr=runPHPCode($filename,$strCODE,$strINPUT,$strARGS);
-         echo $retArr[0]."<+-NOJSON-+>".$retArr['resrun']."<+-NOJSON-+>".$retArr['rescomp'];
-      break;
-
-      case "java":
-         $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".java";
-         $retArr=runJAVACode($filename,$strCODE,$strINPUT,$strARGS);
-         echo $retArr[0]."<+-NOJSON-+>".$retArr['resrun']."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);//输出需要转码
-      break;
-
-      case "vbs":
-         $filename=$path.DIRECTORY_SEPARATOR.$username."_".$taskID.".vbs";
-         $retArr=runVBSCode($filename,$strCODE,$strINPUT,$strARGS);
-         echo $retArr[0]."<+-NOJSON-+>".$retArr['resrun']."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);//输出需要转码
       break;
    }
+   echo $retArr[0]."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['resrun'])."<+-NOJSON-+>".iconv("GBK","UTF-8//IGNORE",$retArr['rescomp']);
 
 }
 ?>
