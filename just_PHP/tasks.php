@@ -1,4 +1,4 @@
-<?php
+﻿<?php
    $type=isset($_GET['t'])?$_GET['t']:"";
    $type=$type==""?"c":$type;
 
@@ -29,7 +29,7 @@
   <div align=center>
     <!--顶部-->
     <div alignstyle="0" style="border-radius: 3%;width: 100%;min-width:666px;height: 90px;">
-      <div  align="center" style="font-size:20;width:100%;overflow:auto;"><h1>C/C++/Python编程平台</h1></div>
+      <div  align="center" style="font-size:20;width:100%;overflow:auto;"><h1>在线编程平台</h1></div>
     </div>
     <div style="width: 100%;max-width: 1338px; margin-top:0px;margin-bottom:10px;min-width: 650px;">
       <div style="background:darkgray;height: 21px;">
@@ -61,7 +61,7 @@
     <!--左侧-->
 
     <!--右侧-->
-    <div alignstyle="0" style="float:left;width: 666px;height:504px;position:relative;background: beige;">
+    <div alignstyle="0" style="float:left;width: 666px;height:504px;position:relative;background: beige;margin-bottom: 10px;">
       <div alignstyle="0" style="width: 650px;height: 442px;left: 0px;top:6px;position: relative;">
         <div style="position: relative;text-align: left;height: 435px;background:yellow">
            <div style="left: 5px;position: relative;">内部评测数据列表</div>
@@ -195,7 +195,7 @@ function saveTest()
 {
    var inputData=  document.getElementById("testinput").value;
    var outputData= document.getElementById("testoutput").value;
-   if(inputData && outputData && taskID && testID)
+   if((inputData || outputData) && taskID && testID)
    {
       $.post("./opt/editTest.php?act=save",{"TKID":taskID,"TTID":testID,"IN":inputData,"OUT":outputData}, function(data){
          alert(data["SAVE"]);
@@ -265,7 +265,7 @@ function saveTask()
       var inputData=  document.getElementById("demoinput").value;
       var outputData= document.getElementById("demooutput").value;
 
-      if(inputData && outputData && taskID )
+      if((inputData || outputData) && taskID )
       {
          $.post("./opt/editTask.php?act=save",{"TKID":taskID,"DATA":taskDescription,"IN":inputData,"OUT":outputData}, function(data){
             alert(data["SAVE"]);
