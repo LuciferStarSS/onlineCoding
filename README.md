@@ -1,5 +1,5 @@
 # onlineCoding
-An online C/C++/Python coding platform.
+在线编程平台，只要服务器上安装了相应的编译系统，就可以支持 C/C++/Python/Java 等语言。
 
 
 本项目onlineCoding中绝大部分代码源自开源项目codeLauncher ( https://github.com/dadadel/codelauncher ) 。 
